@@ -1,0 +1,9 @@
+#!/bin/sh
+# this way to logout probably also saves your session
+# If you know how to logout w/o saving the session, let me know
+
+OUT=`gksudo -- ./grub-choose-default.py -r | grep -i reboot`
+
+if [ -n "$OUT" ]; then
+    gnome-session-save --kill
+fi

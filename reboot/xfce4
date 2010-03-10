@@ -1,0 +1,9 @@
+#!/bin/sh
+# xfce4-session-logout is the name of the binary under Debian,
+# it's possible that it is xfce-session-logout on your system
+
+OUT=`gksudo -- ./grub-choose-default.py -r | grep -i reboot`
+
+if [ -n "$OUT" ]; then
+    xfce4-session-logout
+fi
