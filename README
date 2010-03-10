@@ -1,15 +1,17 @@
 /============================================================================\
 | grub-choose-default.py                                                     |
 |                                                                            |
-| Copyright 2007, David Mohr <david@mcbf.net>                                |
+| Copyright 2007-2008, David Mohr <david@mcbf.net>                           |
 |                                                                            |
-| Version 0.2, 2007-07-28                                                    |
+| Version 0.3, 2008-05-29                                                    |
 |                                                                            |
 | Released under the GNU GPL v2 or higher                                    |
 | This is free software; see the source for copying conditions. There is NO  |
 | warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.|
 |                                                                            |
 \============================================================================/
+
+Homepage: http://da.mcbf.net/wiki/GrubChooseDefault
 
 A simple python GUI program to set your grub default for the next reboot.
 It should run fine both under Linux and Windows. Note though that under Windows
@@ -27,7 +29,8 @@ What it does is:
 
 It uses Tkinter, because that's included in every python installation.
 
-************************************************************************
+
+*****************************************************************************
 * Reboot
 ******** 
 
@@ -51,5 +54,16 @@ but I won't include that until someone complains to me, as that's rare
 nowadays).
 
 
+*****************************************************************************
+
+Right now grub-choose-default only works with legacy grub (0.xx). If there is
+demand for grub 2 compatability, let the author know and an update will be
+considered :-).
+
+
 Please email me with any questions, comments or if you should find a bug at 
 david@mcbf.net.
+
+
+Many thanks to Kjell Braden for sending some patches and getting 
+grub-choose-default into debian!

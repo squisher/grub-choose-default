@@ -172,7 +172,7 @@ def get_win_menu():
             m = get_menu(drive)
             if m != None:
                 return m
-    raise IOError, "grub's menu.lst not found"
+    return None
 
 def init():
     global grub_menu, grub_default_file, grub_menu_locs
@@ -181,7 +181,13 @@ def init():
     else:
     	grub_menu = get_menu("/")
 
-                
+    if grub_menu is None:
+        print >> sys.stderr, "Could not find grub's menu.lst."
+        print >> sys.stderr, "Please make sure you're using legacy grub (ie. "\
+                "not grub2)"
+        print >> sys.stderr, "Aborting."
+        sys.exit(os.errno.ENOENT)
+
     grub_default_file = os.path.join(os.path.split(grub_menu)[0], 'default')
     print >> sys.stderr, "Using", grub_menu, "and", grub_default_file
 
@@ -213,10 +219,13 @@ def get_grub_default():
     fdefault.close()
     #print default_file
     match = re.search("^\d+", default_file[0])
-    old_default = match.group()
-    #print old_default, "was the old default"
+    if match:
+        old_default = match.group()
+        #print old_default, "was the old default"
 
-    return (default_file, int(old_default))
+        return (default_file, int(old_default))
+    else:
+        return (default_file, None)
 
 def change_grub_config_default():
     print >> sys.stderr, "Updating configuration with 'default saved' (backup saved as "+grub_menu+"~)"

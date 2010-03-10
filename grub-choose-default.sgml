@@ -1,0 +1,141 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+
+<!-- Process this file with docbook-to-man to generate an nroff manual
+     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+     less'.  A typical entry in a Makefile or Makefile.am is:
+
+manpage.1: manpage.sgml
+	docbook-to-man $< > $@
+
+    
+	The docbook-to-man binary is found in the docbook-to-man package.
+	Please remember that if you create the nroff version in one of the
+	debian/rules file targets (such as build), you will need to include
+	docbook-to-man in your Build-Depends control field.
+
+  -->
+
+  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+  <!ENTITY dhfirstname "<firstname>Kjell</firstname>">
+  <!ENTITY dhsurname   "<surname>Braden</surname>">
+  <!-- Please adjust the date whenever revising the manpage. -->
+  <!ENTITY dhdate      "<date>2008-05-29</date>">
+  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
+       allowed: see man(7), man(1). -->
+  <!ENTITY dhsection   "<manvolnum>8</manvolnum>">
+  <!ENTITY dhemail     "<email>fnord@pentabarf.de</email>">
+  <!ENTITY dhusername  "Kjell Braden">
+  <!ENTITY dhucpackage "<refentrytitle>GRUB-CHOOSE-DEFAULT</refentrytitle>">
+  <!ENTITY dhpackage   "grub-choose-default">
+
+  <!ENTITY debian      "<productname>Debian</productname>">
+  <!ENTITY gnu         "<acronym>GNU</acronym>">
+  <!ENTITY gpl         "&gnu; <acronym>GPL</acronym>">
+]>
+
+<refentry>
+  <refentryinfo>
+    <address>
+      &dhemail;
+    </address>
+    <author>
+      &dhfirstname;
+      &dhsurname;
+    </author>
+    <copyright>
+      <year>2007</year>
+      <holder>&dhusername;</holder>
+    </copyright>
+    &dhdate;
+  </refentryinfo>
+  <refmeta>
+    &dhucpackage;
+
+    &dhsection;
+  </refmeta>
+  <refnamediv>
+    <refname><command>&dhpackage;</command></refname>
+
+    <refpurpose>control grub's default through a GUI</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+
+    <arg><option>-r</option></arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para><command>&dhpackage;</command> is a small GUI program which displays
+    your grub entries in a menu and lets you quickly change the default
+    without having to go to the command line as well as looking up the index
+    of the new default.</para>
+
+    <para>Additionally <command>&dhpackage;</command> works also under the
+    certain other operating system which resembles an opening in the wall,
+    since it is written in Python. Other OSes have not been tested.</para>
+
+    <para>At this point in time it only works for legacy grub (0.xx).</para>
+
+  </refsect1>
+  <refsect1>
+    <title>OPTIONS</title>
+
+    <variablelist>
+      <varlistentry>
+        <term><option>-r</option>
+        </term>
+        <listitem>
+          <para>If used, <command>&dhpackage;</command> will show the reboot
+          option, which is disabled by default.</para>
+          <para>Note that this only controls the display of the reboot button,
+          the actual reboot logic is outside of the scope of this program.
+          Please check the included support scripts, which provide the
+          functionality for some desktop environments.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1>
+    <title>AUTHOR</title>
+
+    <para>This manual page was originally written by &dhusername; 
+      &lt;&dhemail;&gt; for the &debian; system (but may be used by others).
+      It has since been adopted by the upstream author.
+      Permission is granted to copy, distribute and/or modify this document 
+      under the terms of the &gnu; General Public License, Version 2 or any 
+	  later version published by the Free Software Foundation.
+    </para>
+    <para>The program itself is written by David Mohr &lt;david@mcbf.net&gt;
+      Permission is granted to copy, distribute and/or modify this document
+      under the terms of the &gnu; General Public License, Version 2 or any
+          later version published by the Free Software Foundation.</para>
+	<para>
+	  On Debian systems, the complete text of the GNU General Public
+	  License can be found in /usr/share/common-licenses/GPL-2.
+	</para>
+
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+
+
