@@ -9,7 +9,13 @@ static const gchar * grub_config_locations[] = {
   NULL
 };
 
-GList *
+/* prototypes */
+
+static GList * parse_entries (gchar * contents);
+
+/* implementations */
+
+static GList *
 parse_entries (gchar * contents) {
   GList * list = NULL;
   gchar * cp, * c, * e;
@@ -58,6 +64,8 @@ parse_entries (gchar * contents) {
 
   return g_list_reverse (list);
 }
+
+/* public */
 
 GrubMenu *
 grub_menu_get () {

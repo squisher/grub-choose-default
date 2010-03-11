@@ -12,7 +12,7 @@ typedef struct {
 
 
 void grub_menu_free (GrubMenu ** gm);
-GrubMenu * grub_menu_get ();
+GrubMenu * grub_menu_get (void);
 
 G_END_DECLS
 
