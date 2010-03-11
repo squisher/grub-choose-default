@@ -110,6 +110,8 @@ grub_menu_free (GrubMenu ** gm) {
     g_free ((*gm)->loc);
     g_list_foreach ((*gm)->entries, (GFunc) g_free, NULL);
     g_list_free ((*gm)->entries);
+
+    g_free (*gm);
   }
 }
 
