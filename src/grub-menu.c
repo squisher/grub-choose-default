@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <glib.h>
+#include <string.h>
+
+typedef struct {
+  gchar * loc;
+  GList * entries; /* of type char* */
+} GrubMenu;
+
+GList * parse_entries (gchar * contents) {
+  GList * list = NULL;
+  gchar * cp, * c, * e;
+  gchar * entry;
+  static const gchar *mi = "menuentry";
+
+  for (cp = NULL, c = contents; *c != '\0'; cp = c, c++) {
+    /* look for the letter 'm' at the beginning of a line */
+    if (*c == 'm' && (cp == NULL || *cp == '\n')) {
+      if (strncmp (c, mi, strlen(mi)) == 0) {
+        c += strlen (mi);
+        /* we expect at least one white space */
+
+        if (*c != ' ')
+          continue;
+        else
+          c++;
+        
+        /* skip additional white spaces */
+        while (*c == ' ')
+          c++;
+
+        /* expect the (opening) quotes */
+        if (*c != '"')
+          continue;
+        else
+          c++;
+
+        /* find the (closing) quotes */
+        for (e = c; (*e != '\0') && (*e != '"'); e++) ;
+
+        if (*e == '\0') {
+          c = e;
+          continue;
+        }
+
+        /* copy the entry */
+        *e = '\0';
+        entry = g_strdup (c);
+        c = e;
+
+        list = g_list_prepend (list, entry);
+      }
+    }
+  }
+
+  return g_list_reverse (list);
+}
+
+GrubMenu * grub_menu_get () {
+  GrubMenu * gm = NULL;
+  gchar * cfg;
+  gchar * contents;
+  gsize len;
+  GError * error = NULL;
+  gboolean r;
+
+  cfg = "/boot/grub/grub.cfg";
+
+  r = g_file_test (cfg, G_FILE_TEST_EXISTS);
+
+  if (!r) {
+    return NULL;
+  }
+
+  r = g_file_get_contents (cfg, &contents, &len, &error);
+
+  if (!r) {
+    g_warning ("Error while getting contents of %s: %s", cfg, error->message);
+    g_error_free (error);
+    return NULL;
+  }
+
+  gm = g_new0 (GrubMenu, 1);
+
+  gm->loc = cfg;
+
+  gm->entries = parse_entries (contents);
+
+  g_free (contents);
+
+  return gm;
+}
+
+int main (int argc, char **argv) {
+  GrubMenu * gm;
+
+  gm = grub_menu_get ();
+
+  if (gm == NULL) {
+    g_print ("Could not open the grub configuration!\n");
+    return EXIT_FAILURE;
+  } 
+  else
+  {
+    GList * entries;
+
+    for (entries = gm->entries; entries != NULL; entries = entries->next) {
+      g_print ("%s\n", (gchar *) entries->data);
+    }
+
+    return EXIT_SUCCESS;
+  }
+}
