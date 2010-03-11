@@ -8,7 +8,14 @@ typedef struct {
   GList * entries; /* of type char* */
 } GrubMenu;
 
-GList * parse_entries (gchar * contents) {
+static const gchar * grub_config_locations[] = {
+  "/boot/grub/grub.cfg",
+  "/grub/grub.cfg",
+  NULL
+};
+
+GList *
+parse_entries (gchar * contents) {
   GList * list = NULL;
   gchar * cp, * c, * e;
   gchar * entry;
@@ -59,31 +66,36 @@ GList * parse_entries (gchar * contents) {
 
 GrubMenu * grub_menu_get () {
   GrubMenu * gm = NULL;
-  gchar * cfg;
+  const gchar ** cfg = NULL;
   gchar * contents;
   gsize len;
   GError * error = NULL;
   gboolean r;
 
-  cfg = "/boot/grub/grub.cfg";
+  for (cfg = grub_config_locations; *cfg != NULL; cfg++) {
+    r = g_file_test (*cfg, G_FILE_TEST_EXISTS);
 
-  r = g_file_test (cfg, G_FILE_TEST_EXISTS);
-
-  if (!r) {
-    return NULL;
+    if (!r) {
+      continue;
+    } else {
+      break;
+    }
   }
 
-  r = g_file_get_contents (cfg, &contents, &len, &error);
+  if (!cfg || !*cfg)
+    return NULL;
+
+  r = g_file_get_contents (*cfg, &contents, &len, &error);
 
   if (!r) {
-    g_warning ("Error while getting contents of %s: %s", cfg, error->message);
+    g_warning ("Error while getting contents of %s: %s", *cfg, error->message);
     g_error_free (error);
     return NULL;
   }
 
   gm = g_new0 (GrubMenu, 1);
 
-  gm->loc = cfg;
+  gm->loc = g_strdup (*cfg);
 
   gm->entries = parse_entries (contents);
 
@@ -92,7 +104,17 @@ GrubMenu * grub_menu_get () {
   return gm;
 }
 
-int main (int argc, char **argv) {
+void
+grub_menu_free (GrubMenu ** gm) {
+  if (*gm != NULL) {
+    g_free ((*gm)->loc);
+    g_list_foreach ((*gm)->entries, (GFunc) g_free, NULL);
+    g_list_free ((*gm)->entries);
+  }
+}
+
+int
+main (int argc, char **argv) {
   GrubMenu * gm;
 
   gm = grub_menu_get ();
@@ -108,6 +130,8 @@ int main (int argc, char **argv) {
     for (entries = gm->entries; entries != NULL; entries = entries->next) {
       g_print ("%s\n", (gchar *) entries->data);
     }
+
+    grub_menu_free (&gm);
 
     return EXIT_SUCCESS;
   }
