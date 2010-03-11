@@ -3,5 +3,6 @@ LDFLAGS= `pkg-config --libs gtk+-2.0`
 
 all: grub-menu
 
-grub-menu: grub-menu.o
-grub-menu.o: grub-menu.c
+grub-menu: grub-menu.o grub-menu-main.o
+grub-menu.o: grub-menu.c grub-menu.h
+grub-menu-main.o: grub-menu-main.c grub-menu.h

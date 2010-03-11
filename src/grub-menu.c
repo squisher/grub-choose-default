@@ -1,12 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <glib.h>
 #include <string.h>
-
-typedef struct {
-  gchar * loc;
-  GList * entries; /* of type char* */
-} GrubMenu;
+#include "grub-menu.h"
 
 static const gchar * grub_config_locations[] = {
   "/boot/grub/grub.cfg",
@@ -64,7 +59,8 @@ parse_entries (gchar * contents) {
   return g_list_reverse (list);
 }
 
-GrubMenu * grub_menu_get () {
+GrubMenu *
+grub_menu_get () {
   GrubMenu * gm = NULL;
   const gchar ** cfg = NULL;
   gchar * contents;
@@ -112,29 +108,5 @@ grub_menu_free (GrubMenu ** gm) {
     g_list_free ((*gm)->entries);
 
     g_free (*gm);
-  }
-}
-
-int
-main (int argc, char **argv) {
-  GrubMenu * gm;
-
-  gm = grub_menu_get ();
-
-  if (gm == NULL) {
-    g_print ("Could not open the grub configuration!\n");
-    return EXIT_FAILURE;
-  } 
-  else
-  {
-    GList * entries;
-
-    for (entries = gm->entries; entries != NULL; entries = entries->next) {
-      g_print ("%s\n", (gchar *) entries->data);
-    }
-
-    grub_menu_free (&gm);
-
-    return EXIT_SUCCESS;
   }
 }
