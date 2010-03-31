@@ -3,7 +3,7 @@
 |                                                                            |
 | Copyright 2007-2008, David Mohr <david@mcbf.net>                           |
 |                                                                            |
-| Version 0.3, 2008-05-29                                                    |
+| Version 0.4, 2010-03-XX                                                    |
 |                                                                            |
 | Released under the GNU GPL v2 or higher                                    |
 | This is free software; see the source for copying conditions. There is NO  |
@@ -11,7 +11,7 @@
 |                                                                            |
 \============================================================================/
 
-Homepage: http://da.mcbf.net/wiki/GrubChooseDefault
+Homepage: http://ds.mcbf.net/wiki/GrubChooseDefault
 
 A simple python GUI program to set your grub default for the next reboot.
 It should run fine both under Linux and Windows. Note though that under Windows
@@ -56,9 +56,8 @@ nowadays).
 
 *****************************************************************************
 
-Right now grub-choose-default only works with legacy grub (0.xx). If there is
-demand for grub 2 compatability, let the author know and an update will be
-considered :-).
+This version only works with grub2 (grub-pc). If you are using grub-0.9x
+(grub-legacy), then please use the v0.3 release.
 
 
 Please email me with any questions, comments or if you should find a bug at 
