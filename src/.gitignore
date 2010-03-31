@@ -1,2 +1,5 @@
 *.o
-grub-menu
+grub-menu-test
+grub-choose-default
+core*
+*.tags

@@ -6,7 +6,7 @@ int
 main (int argc, char **argv) {
   GrubMenu * gm;
 
-  gm = grub_menu_get ();
+  gm = grub_menu_get (NULL);
 
   if (gm == NULL) {
     g_print ("Could not open the grub configuration!\n");

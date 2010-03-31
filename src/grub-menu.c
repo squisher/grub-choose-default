@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <glib.h>
 #include <string.h>
+
 #include "grub-menu.h"
+#include "gcd-error.h"
 
 static const gchar * grub_config_locations[] = {
   "/boot/grub/grub.cfg",
@@ -11,13 +13,12 @@ static const gchar * grub_config_locations[] = {
 
 /* prototypes */
 
-static GList * parse_entries (gchar * contents);
+static gint parse_entries (GrubMenu *menu, gchar * contents);
 
 /* implementations */
 
-static GList *
-parse_entries (gchar * contents) {
-  GList * list = NULL;
+static gint
+parse_entries (GrubMenu *menu, gchar * contents) {
   gchar * cp, * c, * e;
   gchar * entry;
   static const gchar *mi = "menuentry";
@@ -57,24 +58,28 @@ parse_entries (gchar * contents) {
         entry = g_strdup (c);
         c = e;
 
-        list = g_list_prepend (list, entry);
+        menu->entries = g_list_prepend (menu->entries, entry);
+        menu->n_entries++;
       }
     }
   }
 
-  return g_list_reverse (list);
+  menu->entries = g_list_reverse (menu->entries);
+
+  return menu->n_entries;
 }
 
 /* public */
 
 GrubMenu *
-grub_menu_get () {
+grub_menu_get (GError **error) {
   GrubMenu * gm = NULL;
   const gchar ** cfg = NULL;
   gchar * contents;
   gsize len;
-  GError * error = NULL;
   gboolean r;
+
+  g_assert (!error || !(*error));
 
   for (cfg = grub_config_locations; *cfg != NULL; cfg++) {
     r = g_file_test (*cfg, G_FILE_TEST_EXISTS);
@@ -86,14 +91,17 @@ grub_menu_get () {
     }
   }
 
-  if (!cfg || !*cfg)
+  if (!cfg || !*cfg) {
+    g_set_error (error,
+                 GRUB_CHOOSE_DEFAULT_ERROR,
+                 GRUB_CHOOSE_DEFAULT_ERROR_CFG_NOT_FOUND,
+                 "Failed to find grub.cfg");
     return NULL;
+  }
 
-  r = g_file_get_contents (*cfg, &contents, &len, &error);
+  r = g_file_get_contents (*cfg, &contents, &len, error);
 
   if (!r) {
-    g_warning ("Error while getting contents of %s: %s", *cfg, error->message);
-    g_error_free (error);
     return NULL;
   }
 
@@ -101,7 +109,7 @@ grub_menu_get () {
 
   gm->loc = g_strdup (*cfg);
 
-  gm->entries = parse_entries (contents);
+  parse_entries (gm, contents);
 
   g_free (contents);
 
