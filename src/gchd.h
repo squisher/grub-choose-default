@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010     David Mohr <david@mcbf.net>
+ * Copyright (c) 2009     David Mohr <david@mcbf.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -15,23 +15,23 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _HAVE_GRUB_MENU
-#define _HAVE_GRUB_MENU
+#ifndef _HAVE_GCHD
+#define _HAVE_GCHD
 
 #include <glib.h>
 
 G_BEGIN_DECLS
 
-typedef struct {
-  gchar * loc;
-  GList * entries; /* of type char* */
-  gint n_entries;
-} GrubMenu;
+typedef struct _Gchd Gchd;
+
+Gchd * gchd_init (void);
+void gchd_free (Gchd *gchd);
+gint gchd_get_menu_entries (Gchd **gchd, GList **entries, GError **error);
+gchar * gchd_get_default_entry (Gchd ** gchd, GError **error);
+gboolean gchd_set_default_entry (Gchd ** gchd, GError **error);
 
 
-void grub_menu_free (GrubMenu ** gm);
-GrubMenu * grub_menu_get (GError **error);
 
 G_END_DECLS
 
-#endif /* _HAVE_GRUB_MENU */
+#endif /* _HAVE_GCHD */

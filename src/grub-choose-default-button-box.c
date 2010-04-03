@@ -44,6 +44,7 @@ typedef struct _GrubChooseDefaultButtonBoxPrivate GrubChooseDefaultButtonBoxPriv
 
 struct _GrubChooseDefaultButtonBoxPrivate {
   GrubMenu * menu;
+  GtkWidget ** buttons;
 };
 
 static void
@@ -96,6 +97,8 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 {
   GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_BUTTON_BOX (self));
   GError *error = NULL;
+  int i;
+  GList *entries;
 
   priv->menu = grub_menu_get (&error);
 
@@ -104,6 +107,21 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
     g_error_free (error);
 
     return;
+  }
+
+  priv->buttons = g_new (GtkWidget *, priv->menu->n_entries);
+
+  for (i=0, entries = priv->menu->entries;
+       i<priv->menu->n_entries && entries != NULL;
+       i++, entries = g_list_next (entries)) {
+    GtkWidget * button;
+
+    priv->buttons[i] = button = gtk_button_new_with_label (entries->data);
+    gtk_button_set_alignment (GTK_BUTTON (button), 0.0, 0.5);
+
+    gtk_container_add (GTK_CONTAINER (self), button);
+      
+    gtk_widget_show (button);
   }
 }
 

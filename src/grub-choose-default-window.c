@@ -18,6 +18,7 @@
  */
 
 #include "grub-choose-default-window.h"
+#include "grub-choose-default-button-box.h"
 
 /*- private prototypes -*/
 
@@ -40,7 +41,7 @@ G_DEFINE_TYPE (GrubChooseDefaultWindow, grub_choose_default_window, GTK_TYPE_DIA
 typedef struct _GrubChooseDefaultWindowPrivate GrubChooseDefaultWindowPrivate;
 
 struct _GrubChooseDefaultWindowPrivate {
-  int dummy;
+  GrubChooseDefaultButtonBox * box;
 };
 
 static void
@@ -88,6 +89,34 @@ grub_choose_default_window_class_init (GrubChooseDefaultWindowClass *klass)
 static void
 grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 {
+  GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_WINDOW (self));
+  GtkWidget *area, *scrolled;
+  GtkRequisition req;
+
+  area = gtk_dialog_get_content_area (GTK_DIALOG (self));
+
+  scrolled = gtk_scrolled_window_new (NULL, NULL);
+  gtk_container_add (GTK_CONTAINER (area), scrolled);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_widget_show (scrolled);
+
+  priv->box = grub_choose_default_button_box_new ();
+
+  gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (scrolled), GTK_WIDGET (priv->box));
+  gtk_widget_show (GTK_WIDGET (priv->box));
+
+  gtk_widget_size_request (GTK_WIDGET (priv->box), &req);
+  req.height += 50;
+  req.width += 50;
+
+  if (req.width > 600 )
+    req.width = 600;
+  if (req.height > 800)
+    req.height = 800;
+
+  g_debug ("Will request size %d by %d", req.width, req.height);
+
+  gtk_window_set_default_size (GTK_WINDOW (self), req.width, req.height);
 }
 
 
