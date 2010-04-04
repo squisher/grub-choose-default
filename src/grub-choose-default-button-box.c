@@ -20,7 +20,7 @@
 #include <gtk/gtk.h>
 
 #include "grub-choose-default-button-box.h"
-#include "grub-menu.h"
+#include "gchd.h"
 
 /*- private prototypes -*/
 
@@ -43,7 +43,7 @@ G_DEFINE_TYPE (GrubChooseDefaultButtonBox, grub_choose_default_button_box, GTK_T
 typedef struct _GrubChooseDefaultButtonBoxPrivate GrubChooseDefaultButtonBoxPrivate;
 
 struct _GrubChooseDefaultButtonBoxPrivate {
-  GrubMenu * menu;
+  Gchd *gchd;
   GtkWidget ** buttons;
 };
 
@@ -76,7 +76,8 @@ grub_choose_default_button_box_finalize (GObject *object)
 {
   GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_BUTTON_BOX (object));
 
-  grub_menu_free (&(priv->menu));
+  gchd_free (priv->gchd);
+
   G_OBJECT_CLASS (grub_choose_default_button_box_parent_class)->finalize (object);
 }
 
@@ -99,20 +100,24 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
   GError *error = NULL;
   int i;
   GList *entries;
+  gint n_entries;
 
-  priv->menu = grub_menu_get (&error);
+  priv->gchd = gchd_new ();
 
-  if (error) {
+  n_entries = gchd_get_menu_entries (priv->gchd, &entries, &error);
+
+  if (n_entries == -1) {
+    /* FIXME: show error in gui */
     g_warning (error->message);
     g_error_free (error);
 
     return;
   }
 
-  priv->buttons = g_new (GtkWidget *, priv->menu->n_entries);
+  priv->buttons = g_new (GtkWidget *, n_entries);
 
-  for (i=0, entries = priv->menu->entries;
-       i<priv->menu->n_entries && entries != NULL;
+  for (i=0;
+       i<n_entries && entries != NULL;
        i++, entries = g_list_next (entries)) {
     GtkWidget * button;
 
