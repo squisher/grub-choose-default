@@ -47,6 +47,9 @@ typedef struct {
 
 typedef struct {
   GtkVBoxClass parent_class;
+
+  /* signals */
+  void (*selected) (gchar * entry);
 } GrubChooseDefaultButtonBoxClass;
 
 GType grub_choose_default_button_box_get_type (void);

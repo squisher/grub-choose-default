@@ -22,6 +22,9 @@
 
 /*- private prototypes -*/
 
+static void handle_selected (GrubChooseDefaultButtonBox *bbox, const gchar * entry, gpointer data);
+
+
 /*- globals -*/
 
 enum {
@@ -101,6 +104,7 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   gtk_widget_show (scrolled);
 
   priv->box = grub_choose_default_button_box_new ();
+  g_signal_connect (priv->box, "selected", G_CALLBACK (handle_selected), self);
 
   gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (scrolled), GTK_WIDGET (priv->box));
   gtk_widget_show (GTK_WIDGET (priv->box));
@@ -123,6 +127,14 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 /***************/
 /*- internals -*/
 /***************/
+
+static void
+handle_selected (GrubChooseDefaultButtonBox *bbox, const gchar * entry, gpointer data)
+{
+  GrubChooseDefaultWindow *win = GRUB_CHOOSE_DEFAULT_WINDOW (data);
+
+  gtk_dialog_response (GTK_DIALOG (win), GTK_RESPONSE_ACCEPT);
+}
 
 /*******************/
 /*- public methods-*/

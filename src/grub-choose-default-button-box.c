@@ -24,11 +24,19 @@
 
 /*- private prototypes -*/
 
+static void button_clicked (GtkButton *button, gpointer user_data);
+
+
 /*- globals -*/
 
 enum {
   PROP_0,
 };
+
+enum {
+  SELECTED,
+  LAST_SIGNAL,
+}; 
 
 
 /*****************/
@@ -41,6 +49,8 @@ G_DEFINE_TYPE (GrubChooseDefaultButtonBox, grub_choose_default_button_box, GTK_T
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), GRUB_CHOOSE_DEFAULT_TYPE_BUTTON_BOX, GrubChooseDefaultButtonBoxPrivate))
 
 typedef struct _GrubChooseDefaultButtonBoxPrivate GrubChooseDefaultButtonBoxPrivate;
+
+static guint signals[LAST_SIGNAL];
 
 struct _GrubChooseDefaultButtonBoxPrivate {
   Gchd *gchd;
@@ -91,6 +101,11 @@ grub_choose_default_button_box_class_init (GrubChooseDefaultButtonBoxClass *klas
   object_class->get_property = grub_choose_default_button_box_get_property;
   object_class->set_property = grub_choose_default_button_box_set_property;
   object_class->finalize = grub_choose_default_button_box_finalize;
+
+  signals[SELECTED] = g_signal_new ("selected", GRUB_CHOOSE_DEFAULT_TYPE_BUTTON_BOX, G_SIGNAL_ACTION,
+                                    G_STRUCT_OFFSET (GrubChooseDefaultButtonBoxClass, selected),
+                                    NULL, NULL, g_cclosure_marshal_VOID__STRING,
+                                    G_TYPE_NONE, 1, G_TYPE_STRING);
 }
 
 static void
@@ -126,6 +141,8 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
     priv->buttons[i] = button = gtk_button_new_with_label (entries->data);
     gtk_button_set_alignment (GTK_BUTTON (button), 0.0, 0.5);
 
+    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked), self);
+
     gtk_box_pack_start (GTK_BOX (self), button,
                         FALSE, FALSE, 0);
       
@@ -137,6 +154,19 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 /***************/
 /*- internals -*/
 /***************/
+
+static void
+button_clicked (GtkButton *button, gpointer user_data)
+{
+  GrubChooseDefaultButtonBox *bbox = GRUB_CHOOSE_DEFAULT_BUTTON_BOX (user_data);
+  const gchar *label;
+
+  label = gtk_button_get_label (button);
+
+  g_debug ("Pressed %s", label);
+
+  g_signal_emit (bbox, signals[SELECTED], 0, label);
+}
 
 /*******************/
 /*- public methods-*/
