@@ -19,6 +19,8 @@
 
 #include <gtk/gtk.h>
 
+#include <string.h>
+
 #include "grub-choose-default-button-box.h"
 #include "gchd.h"
 
@@ -116,12 +118,24 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
   int i;
   GList *entries;
   gint n_entries;
+  gchar * def_entry;
 
   priv->gchd = gchd_new ();
 
   n_entries = gchd_get_menu_entries (priv->gchd, &entries, &error);
 
   if (n_entries == -1)
+  {
+    /* FIXME: show error in gui */
+    g_warning (error->message);
+    g_error_free (error);
+
+    return;
+  }
+
+  def_entry = gchd_get_default_entry (priv->gchd, &error);
+
+  if (def_entry == NULL)
   {
     /* FIXME: show error in gui */
     g_warning (error->message);
@@ -137,8 +151,30 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
        i++, entries = g_list_next (entries))
   {
     GtkWidget * button;
+    gchar * entry = entries->data;
+    GtkWidget * label;
 
-    priv->buttons[i] = button = gtk_button_new_with_label (entries->data);
+    priv->buttons[i] = button = gtk_button_new ();
+    label = gtk_label_new ("");
+
+    if (strcmp (entry, def_entry) == 0)
+    {
+      //gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NORMAL);
+      //gtk_label_set_attributes (GTK_LABEL (label), "use-underline");
+      gchar * markup;
+
+      markup = g_strdup_printf ("<b>%s</b>", entry);
+      gtk_label_set_markup (GTK_LABEL (label), markup);
+      g_free (markup);
+    }
+    else
+    {
+      gtk_label_set_text (GTK_LABEL (label), entry);
+    }
+
+    gtk_container_add (GTK_CONTAINER (button), label);
+    gtk_widget_show (label);
+
     gtk_button_set_alignment (GTK_BUTTON (button), 0.0, 0.5);
 
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked), self);
