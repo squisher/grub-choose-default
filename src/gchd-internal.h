@@ -32,7 +32,7 @@ typedef struct {
 
 struct _Gchd {
   gchar * (*get_default_entry) (Gchd * gchd, GError **error);
-  gboolean (*set_default_entry) (Gchd * gchd, GError **error);
+  gboolean (*set_default_entry) (Gchd * gchd, gchar * entry, GError **error);
 
   GchdMenu menu;
   gchar * default_entry;

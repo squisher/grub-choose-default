@@ -28,9 +28,7 @@ Gchd * gchd_new (void);
 void gchd_free (Gchd *gchd);
 gint gchd_get_menu_entries (Gchd * gchd, GList **entries, GError **error);
 gchar * gchd_get_default_entry (Gchd * gchd, GError **error);
-gboolean gchd_set_default_entry (Gchd * gchd, GError **error);
-
-
+gboolean gchd_set_default_entry (Gchd * gchd, gchar * entry, GError **error);
 
 G_END_DECLS
 

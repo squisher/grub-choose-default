@@ -25,7 +25,7 @@ static const gchar * default_key = "saved_entry";
 /* prototypes */
 
 gchar * get_default_entry (Gchd * gchd, GError **error);
-gboolean set_default_entry (Gchd * gchd, GError **error);
+gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
 
 
 /* implementations */
@@ -92,8 +92,40 @@ get_default_entry (Gchd * gchd, GError **error)
 }
 
 gboolean
-set_default_entry (Gchd * gchd, GError **error)
+set_default_entry (Gchd * gchd, gchar * entry, GError **error)
 {
-  /* STUB */
-  return FALSE;
+  /* Execute:
+   * grub-set-default $entry
+   */
+  gchar * argv [3];
+  gchar * s_output;
+  gchar * s_error;
+  gint exit_status;
+  gboolean r;
+
+  g_assert (entry != NULL);
+
+  argv[0] = "grub-set-default";
+  argv[1] = entry;
+  argv[2] = NULL;
+
+  r = g_spawn_sync (NULL,
+                argv,
+                NULL,
+                G_SPAWN_SEARCH_PATH,
+                NULL,
+                NULL,
+                &s_output,
+                &s_error,
+                &exit_status,
+                error);
+
+  if (!r)
+  {
+    /* an error occurred which is passed onto the caller through
+     * the error argument */
+    return FALSE;
+  }
+
+  return TRUE;
 }

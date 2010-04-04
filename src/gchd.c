@@ -84,10 +84,10 @@ gchd_get_default_entry (Gchd * gchd, GError **error)
 }
 
 gboolean
-gchd_set_default_entry (Gchd * gchd, GError **error)
+gchd_set_default_entry (Gchd * gchd, gchar * entry, GError **error)
 {
   g_assert (gchd->set_default_entry != NULL);
   g_assert (!error || !*error);
 
-  return gchd->set_default_entry (gchd, error);
+  return gchd->set_default_entry (gchd, entry, error);
 }
