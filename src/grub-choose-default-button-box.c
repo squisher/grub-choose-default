@@ -106,7 +106,8 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 
   n_entries = gchd_get_menu_entries (priv->gchd, &entries, &error);
 
-  if (n_entries == -1) {
+  if (n_entries == -1)
+  {
     /* FIXME: show error in gui */
     g_warning (error->message);
     g_error_free (error);
@@ -118,13 +119,15 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 
   for (i=0;
        i<n_entries && entries != NULL;
-       i++, entries = g_list_next (entries)) {
+       i++, entries = g_list_next (entries))
+  {
     GtkWidget * button;
 
     priv->buttons[i] = button = gtk_button_new_with_label (entries->data);
     gtk_button_set_alignment (GTK_BUTTON (button), 0.0, 0.5);
 
-    gtk_container_add (GTK_CONTAINER (self), button);
+    gtk_box_pack_start (GTK_BOX (self), button,
+                        FALSE, FALSE, 0);
       
     gtk_widget_show (button);
   }
