@@ -15,23 +15,11 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _HAVE_GCHD
-#define _HAVE_GCHD
 
-#include <glib.h>
+#include "gchd-error.h"
 
-G_BEGIN_DECLS
-
-typedef struct _Gchd Gchd;
-
-Gchd * gchd_new (void);
-void gchd_free (Gchd *gchd);
-gint gchd_get_menu_entries (Gchd * gchd, GList **entries, GError **error);
-gchar * gchd_get_default_entry (Gchd * gchd, GError **error);
-gboolean gchd_set_default_entry (Gchd * gchd, GError **error);
-
-
-
-G_END_DECLS
-
-#endif /* _HAVE_GCHD */
+GQuark
+gchd_error_quark (void)
+{
+  return g_quark_from_static_string ("gchd-error-quark");
+}

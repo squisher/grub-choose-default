@@ -1,5 +1,5 @@
 *.o
-grub-menu-test
+gchd-menu-test
 grub-choose-default
 core*
 *.tags

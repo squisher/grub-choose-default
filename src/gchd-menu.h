@@ -15,23 +15,16 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _HAVE_GRUB_MENU
-#define _HAVE_GRUB_MENU
+#ifndef _HAVE_GCHD_MENU
+#define _HAVE_GCHD_MENU
 
 #include <glib.h>
+#include "gchd-internal.h"
 
 G_BEGIN_DECLS
 
-typedef struct {
-  gchar * loc;
-  GList * entries; /* of type char* */
-  gint n_entries;
-} GrubMenu;
-
-
-void grub_menu_free (GrubMenu ** gm);
-GrubMenu * grub_menu_get (GError **error);
+gboolean gchd_get_menu (GchdMenu *menu, GError **error);
 
 G_END_DECLS
 
-#endif /* _HAVE_GRUB_MENU */
+#endif /* _HAVE_GCHD_MENU */

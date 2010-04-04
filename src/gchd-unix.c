@@ -16,10 +16,9 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "gcd-error.h"
+#include "gchd-unix.h"
 
-GQuark
-grub_choose_default_error_quark (void)
+void
+gcd_unix_init (Gchd * gchd)
 {
-  return g_quark_from_static_string ("grub-choose-default-error-quark");
 }

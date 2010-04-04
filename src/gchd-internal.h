@@ -20,19 +20,21 @@
 
 #include <glib.h>
 
+#include "gchd.h"
+
 G_BEGIN_DECLS
 
 typedef struct {
   gchar * loc;
   GList * entries; /* of type char* */
   gint n_entries;
-} GrubMenu;
+} GchdMenu;
 
 struct _Gchd {
-  gchar * (*gchd_get_default_entry) (Gchd ** gchd, GError **error);
-  gboolean (*gchd_set_default_entry) (Gchd ** gchd, GError **error);
+  gchar * (*get_default_entry) (Gchd * gchd, GError **error);
+  gboolean (*set_default_entry) (Gchd * gchd, GError **error);
 
-  GrubMenu menu;
+  GchdMenu menu;
   gchar * default_entry;
 };
 

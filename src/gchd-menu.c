@@ -2,8 +2,8 @@
 #include <glib.h>
 #include <string.h>
 
-#include "grub-menu.h"
-#include "gcd-error.h"
+#include "gchd-menu.h"
+#include "gchd-error.h"
 
 static const gchar * grub_config_locations[] = {
   "/boot/grub/grub.cfg",
@@ -13,12 +13,12 @@ static const gchar * grub_config_locations[] = {
 
 /* prototypes */
 
-static gint parse_entries (GrubMenu *menu, gchar * contents);
+static gint parse_entries (GchdMenu *menu, gchar * contents);
 
 /* implementations */
 
 static gint
-parse_entries (GrubMenu *menu, gchar * contents) {
+parse_entries (GchdMenu *menu, gchar * contents) {
   gchar * cp, * c, * e;
   gchar * entry;
   static const gchar *mi = "menuentry";
@@ -71,9 +71,8 @@ parse_entries (GrubMenu *menu, gchar * contents) {
 
 /* public */
 
-GrubMenu *
-grub_menu_get (GError **error) {
-  GrubMenu * gm = NULL;
+gboolean
+gchd_get_menu (GchdMenu *gm, GError **error) {
   const gchar ** cfg = NULL;
   gchar * contents;
   gsize len;
@@ -93,19 +92,21 @@ grub_menu_get (GError **error) {
 
   if (!cfg || !*cfg) {
     g_set_error (error,
-                 GRUB_CHOOSE_DEFAULT_ERROR,
-                 GRUB_CHOOSE_DEFAULT_ERROR_CFG_NOT_FOUND,
+                 GCHD_ERROR,
+                 GCHD_ERROR_CFG_NOT_FOUND,
                  "Failed to find grub.cfg");
-    return NULL;
+    return FALSE;
   }
 
   r = g_file_get_contents (*cfg, &contents, &len, error);
 
   if (!r) {
-    return NULL;
+    g_set_error (error,
+                 GCHD_ERROR,
+                 GCHD_ERROR_CFG_NOT_READABLE,
+                 "Failed to read contents of grub.cfg");
+    return FALSE;
   }
-
-  gm = g_new0 (GrubMenu, 1);
 
   gm->loc = g_strdup (*cfg);
 
@@ -113,16 +114,5 @@ grub_menu_get (GError **error) {
 
   g_free (contents);
 
-  return gm;
-}
-
-void
-grub_menu_free (GrubMenu ** gm) {
-  if (*gm != NULL) {
-    g_free ((*gm)->loc);
-    g_list_foreach ((*gm)->entries, (GFunc) g_free, NULL);
-    g_list_free ((*gm)->entries);
-
-    g_free (*gm);
-  }
+  return TRUE;
 }

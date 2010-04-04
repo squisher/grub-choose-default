@@ -18,33 +18,76 @@
 
 #include <glib.h>
 
-#include "ghcd.h"
+#include "gchd.h"
+#include "gchd-menu.h"
+#ifdef __WIN32
+#  include "gchd-windows.h"
+#else
+#  include "gchd-unix.h"
+#endif
 
 Gchd *
-gchd_init (void)
+gchd_new (void)
 {
-  return g_new0 (Gchd, 1);
+  Gchd *gchd;
+  
+  gchd = g_new0 (Gchd, 1);
+
+#ifdef __WIN32
+  gcd_windows_init (gchd);
+#else
+  gcd_unix_init (gchd);
+#endif
+
+  return gchd;
 }
 
 void
 gchd_free (Gchd *gchd)
 {
+  g_free (gchd->menu.loc);
+  g_list_foreach (gchd->menu.entries, (GFunc) g_free, NULL);
+  g_list_free (gchd->menu.entries);
 
   g_free (gchd);
 }
 
 gint
-gchd_get_menu_entries
-(Gchd **gchd, GList **entries, GError **error)
+gchd_get_menu_entries (Gchd *gchd, GList **entries, GError **error)
 {
+  gboolean r;
+
+  g_assert (entries != NULL);
+
+  r = gchd_get_menu (&(gchd->menu), error);
+
+  if (r)
+  {
+    /* maybe we should copy this? */
+    *entries = gchd->menu.entries;
+
+    return gchd->menu.n_entries;
+  }
+  else
+  {
+    return -1;
+  }
 }
 
 gchar *
-gchd_get_default_entry (Gchd ** gchd, GError **error)
+gchd_get_default_entry (Gchd * gchd, GError **error)
 {
+  g_assert (gchd->get_default_entry != NULL);
+  g_assert (!error || !*error);
+
+  return gchd->get_default_entry (gchd, error);
 }
 
 gboolean
-gchd_set_default_entry (Gchd ** gchd, GError **error)
+gchd_set_default_entry (Gchd * gchd, GError **error)
 {
+  g_assert (gchd->set_default_entry != NULL);
+  g_assert (!error || !*error);
+
+  return gchd->set_default_entry (gchd, error);
 }
