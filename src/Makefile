@@ -3,7 +3,7 @@ LDFLAGS= `pkg-config --libs gtk+-2.0`
 
 all: gchd-test grub-choose-default
 
-grub-choose-default: grub-choose-default-main.o grub-choose-default-button-box.o grub-choose-default-window.o gchd-error.o gchd-menu.o gchd.o gchd-unix.o
+grub-choose-default: grub-choose-default-main.o grub-choose-default-button-box.o grub-choose-default-window.o grub-choose-default-widget.o gchd-error.o gchd-menu.o gchd.o gchd-unix.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 gchd-test: gchd-test.o gchd-menu.o gchd-error.o gchd.o gchd-unix.o
@@ -19,6 +19,7 @@ gchd-test.o: gchd-test.c gchd.h
 grub-choose-default-button-box.o: grub-choose-default-button-box.c grub-choose-default-button-box.h
 grub-choose-default-main.o: grub-choose-default-main.c grub-choose-default-window.h
 grub-choose-default-window.o: grub-choose-default-window.c grub-choose-default-window.h
+grub-choose-default-widget.o: grub-choose-default-widget.c grub-choose-default-widget.h
 
 clean:
 	rm *.o grub-choose-default gchd-test

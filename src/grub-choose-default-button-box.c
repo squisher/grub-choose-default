@@ -23,16 +23,22 @@
 
 #include "grub-choose-default-button-box.h"
 #include "gchd.h"
+#include "grub-choose-default-widget.h"
 
 /*- private prototypes -*/
 
-static void button_clicked (GtkButton *button, gpointer user_data);
+static void grub_choose_default_widget_interface_init (GrubChooseDefaultWidgetInterface *iface);
 
+static gboolean commit (GrubChooseDefaultWidget * widget);
+
+static void button_clicked (GtkButton *button, gpointer user_data);
 
 /*- globals -*/
 
 enum {
   PROP_0,
+  PROP_DEFAULT_ENTRY,
+  PROP_AUTO_COMMIT,
 };
 
 enum {
@@ -45,7 +51,8 @@ enum {
 /*- class setup -*/
 /*****************/
 
-G_DEFINE_TYPE (GrubChooseDefaultButtonBox, grub_choose_default_button_box, GTK_TYPE_VBOX)
+G_DEFINE_TYPE_WITH_CODE  (GrubChooseDefaultButtonBox, grub_choose_default_button_box, GTK_TYPE_VBOX,
+                          G_IMPLEMENT_INTERFACE (GRUB_CHOOSE_DEFAULT_TYPE_WIDGET, grub_choose_default_widget_interface_init));
 
 #define GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), GRUB_CHOOSE_DEFAULT_TYPE_BUTTON_BOX, GrubChooseDefaultButtonBoxPrivate))
@@ -66,6 +73,10 @@ grub_choose_default_button_box_get_property (GObject *object, guint property_id,
   //GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_BUTTON_BOX (object));
 
   switch (property_id) {
+  case PROP_DEFAULT_ENTRY:
+    break;
+  case PROP_AUTO_COMMIT:
+    break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
   }
@@ -78,6 +89,10 @@ grub_choose_default_button_box_set_property (GObject *object, guint property_id,
   //GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_BUTTON_BOX (object));
 
   switch (property_id) {
+  case PROP_DEFAULT_ENTRY:
+    break;
+  case PROP_AUTO_COMMIT:
+    break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
   }
@@ -104,10 +119,19 @@ grub_choose_default_button_box_class_init (GrubChooseDefaultButtonBoxClass *klas
   object_class->set_property = grub_choose_default_button_box_set_property;
   object_class->finalize = grub_choose_default_button_box_finalize;
 
+  g_object_class_override_property (object_class, PROP_DEFAULT_ENTRY, "default-entry");
+  g_object_class_override_property (object_class, PROP_AUTO_COMMIT, "auto-commit");
+
   signals[SELECTED] = g_signal_new ("selected", GRUB_CHOOSE_DEFAULT_TYPE_BUTTON_BOX, G_SIGNAL_ACTION,
                                     G_STRUCT_OFFSET (GrubChooseDefaultButtonBoxClass, selected),
                                     NULL, NULL, g_cclosure_marshal_VOID__STRING,
                                     G_TYPE_NONE, 1, G_TYPE_STRING);
+}
+
+static void
+grub_choose_default_widget_interface_init (GrubChooseDefaultWidgetInterface *iface)
+{
+  iface->commit = commit;
 }
 
 static void
@@ -202,6 +226,14 @@ button_clicked (GtkButton *button, gpointer user_data)
   g_debug ("Pressed %s", label);
 
   g_signal_emit (bbox, signals[SELECTED], 0, label);
+}
+
+static gboolean
+commit (GrubChooseDefaultWidget * widget)
+{
+  GrubChooseDefaultButtonBox *bbox = GRUB_CHOOSE_DEFAULT_BUTTON_BOX (widget);
+  GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (bbox);
+
 }
 
 /*******************/
