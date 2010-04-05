@@ -24,6 +24,7 @@
 #include "grub-choose-default-button-box.h"
 #include "gchd.h"
 #include "grub-choose-default-widget.h"
+#include "grub-choose-default-util.h"
 
 /*- private prototypes -*/
 
@@ -227,8 +228,6 @@ button_clicked (GtkButton *button, gpointer user_data)
   GrubChooseDefaultWidgetInterface * widget_class = g_type_default_interface_peek (GRUB_CHOOSE_DEFAULT_TYPE_WIDGET);
 
   const gchar *label;
-  GError * error = NULL;
-  gboolean r;
 
   label = gtk_button_get_label (button);
   priv->def_entry = g_strdup (label);
@@ -239,30 +238,33 @@ button_clicked (GtkButton *button, gpointer user_data)
 
   if (priv->autocommit)
   {
-    /* FIXME: Handle errors */
-    r = commit (GRUB_CHOOSE_DEFAULT_WIDGET (bbox), &error);
-
-    if (!r)
-    {
-      g_critical ("Error: %s\n", error->message);
-      g_error_free (error);
-    }
-    else 
-    {
-      g_debug ("Set default to %s\n", priv->def_entry);
-    }
+    commit (GRUB_CHOOSE_DEFAULT_WIDGET (bbox), NULL);
   }
 }
 
 static gboolean
-commit (GrubChooseDefaultWidget * widget, GError **error)
+commit (GrubChooseDefaultWidget * widget, GError **report_error)
 {
   GrubChooseDefaultButtonBox *bbox = GRUB_CHOOSE_DEFAULT_BUTTON_BOX (widget);
   GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (bbox);
 
+  GError *my_error = NULL;
+  GError **error;
   gboolean r;
 
+  if (report_error == NULL)
+    error = &my_error;
+  else
+    error = report_error;
+
   r = gchd_set_default_entry (priv->gchd, priv->def_entry, error);
+
+  if (report_error == NULL)
+  {
+    g_critical ("%s\n", my_error->message);
+    grub_choose_default_error (NULL, my_error);
+    g_error_free (my_error);
+  }
 
   return r;
 }
