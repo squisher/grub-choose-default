@@ -21,6 +21,7 @@
 static void
 grub_choose_default_widget_init (gpointer g_iface)
 {
+  GrubChooseDefaultWidgetInterface * iface = g_iface;
   static gboolean is_initialized = FALSE;
 
   if (!is_initialized)
@@ -37,6 +38,11 @@ grub_choose_default_widget_init (gpointer g_iface)
                                                               "Auto-commit selections",
                                                               FALSE,
                                                               G_PARAM_READWRITE));
+    iface->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED] = g_signal_new ("selected",
+                                                                               G_TYPE_FROM_CLASS (g_iface), G_SIGNAL_ACTION,
+                                                                               G_STRUCT_OFFSET (GrubChooseDefaultWidgetInterface, selected),
+                                                                               NULL, NULL, g_cclosure_marshal_VOID__STRING,
+                                                                               G_TYPE_NONE, 1, G_TYPE_STRING);
 
     is_initialized = TRUE;
   }

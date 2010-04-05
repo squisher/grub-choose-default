@@ -29,13 +29,24 @@ G_BEGIN_DECLS
 #define GRUB_CHOOSE_DEFAULT_IS_WIDGET(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), GRUB_CHOOSE_DEFAULT_TYPE_WIDGET))
 #define GRUB_CHOOSE_DEFAULT_WIDGET_GET_INTERFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE ((o), GRUB_CHOOSE_DEFAULT_TYPE_WIDGET, GrubChooseDefaultWidgetInterface))
 
+enum {
+  GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED,
+  GRUB_CHOOSE_DEFAULT_WIDGET_LAST_SIGNAL,
+}; 
+
 typedef struct {} GrubChooseDefaultWidget; /* dummy struct */
 
 typedef struct
 {
   GTypeInterface parent;
 
+  guint signals[GRUB_CHOOSE_DEFAULT_WIDGET_LAST_SIGNAL];
+
+  /* public functions */
   gboolean (*commit) (GrubChooseDefaultWidget * widget);
+
+  /* signals */
+  void (*selected) (gchar * entry);
 } GrubChooseDefaultWidgetInterface;
 
 GType grub_choose_default_widget_get_type (void);

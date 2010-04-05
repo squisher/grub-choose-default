@@ -42,7 +42,6 @@ enum {
 };
 
 enum {
-  SELECTED,
   LAST_SIGNAL,
 }; 
 
@@ -59,7 +58,7 @@ G_DEFINE_TYPE_WITH_CODE  (GrubChooseDefaultButtonBox, grub_choose_default_button
 
 typedef struct _GrubChooseDefaultButtonBoxPrivate GrubChooseDefaultButtonBoxPrivate;
 
-static guint signals[LAST_SIGNAL];
+//static guint signals[LAST_SIGNAL];
 
 struct _GrubChooseDefaultButtonBoxPrivate {
   Gchd *gchd;
@@ -122,10 +121,6 @@ grub_choose_default_button_box_class_init (GrubChooseDefaultButtonBoxClass *klas
   g_object_class_override_property (object_class, PROP_DEFAULT_ENTRY, "default-entry");
   g_object_class_override_property (object_class, PROP_AUTO_COMMIT, "auto-commit");
 
-  signals[SELECTED] = g_signal_new ("selected", GRUB_CHOOSE_DEFAULT_TYPE_BUTTON_BOX, G_SIGNAL_ACTION,
-                                    G_STRUCT_OFFSET (GrubChooseDefaultButtonBoxClass, selected),
-                                    NULL, NULL, g_cclosure_marshal_VOID__STRING,
-                                    G_TYPE_NONE, 1, G_TYPE_STRING);
 }
 
 static void
@@ -176,9 +171,10 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
   {
     GtkWidget * button;
     gchar * entry = entries->data;
-    GtkWidget * label;
+    //GtkWidget * label;
 
-    priv->buttons[i] = button = gtk_button_new ();
+    priv->buttons[i] = button = gtk_button_new_with_label (entry);
+    /*
     label = gtk_label_new ("");
 
     if (strcmp (entry, def_entry) == 0)
@@ -198,6 +194,7 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 
     gtk_container_add (GTK_CONTAINER (button), label);
     gtk_widget_show (label);
+    */
 
     gtk_button_set_alignment (GTK_BUTTON (button), 0.0, 0.5);
 
@@ -220,20 +217,25 @@ button_clicked (GtkButton *button, gpointer user_data)
 {
   GrubChooseDefaultButtonBox *bbox = GRUB_CHOOSE_DEFAULT_BUTTON_BOX (user_data);
   const gchar *label;
+  GrubChooseDefaultWidgetInterface * widget_class = g_type_default_interface_peek (GRUB_CHOOSE_DEFAULT_TYPE_WIDGET);
 
   label = gtk_button_get_label (button);
 
   g_debug ("Pressed %s", label);
 
-  g_signal_emit (bbox, signals[SELECTED], 0, label);
+  g_signal_emit (bbox, widget_class->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED], 0, label);
 }
 
 static gboolean
 commit (GrubChooseDefaultWidget * widget)
 {
+  /*
   GrubChooseDefaultButtonBox *bbox = GRUB_CHOOSE_DEFAULT_BUTTON_BOX (widget);
   GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (bbox);
 
+  */
+
+  return TRUE;
 }
 
 /*******************/
