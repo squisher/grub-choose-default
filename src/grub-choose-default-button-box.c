@@ -179,10 +179,11 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
   {
     GtkWidget * button;
     gchar * entry = entries->data;
-    //GtkWidget * label;
+    GtkWidget * label;
 
-    priv->buttons[i] = button = gtk_button_new_with_label (entry);
-    /*
+    priv->buttons[i] = button = gtk_button_new ();
+    g_object_set_data (G_OBJECT (button), "entry", entry);
+
     label = gtk_label_new ("");
 
     if (strcmp (entry, def_entry) == 0)
@@ -202,7 +203,6 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 
     gtk_container_add (GTK_CONTAINER (button), label);
     gtk_widget_show (label);
-    */
 
     gtk_button_set_alignment (GTK_BUTTON (button), 0.0, 0.5);
 
@@ -229,7 +229,10 @@ button_clicked (GtkButton *button, gpointer user_data)
 
   const gchar *label;
 
-  label = gtk_button_get_label (button);
+  label = g_object_get_data (G_OBJECT (button), "entry");
+
+  g_assert (label != NULL);
+
   priv->def_entry = g_strdup (label);
 
   g_debug ("Pressed %s", label);
