@@ -18,11 +18,12 @@
  */
 
 #include "grub-choose-default-window.h"
+#include "grub-choose-default-widget.h"
 #include "grub-choose-default-button-box.h"
 
 /*- private prototypes -*/
 
-static void handle_selected (GrubChooseDefaultButtonBox *bbox, const gchar * entry, gpointer data);
+static void handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer data);
 
 
 /*- globals -*/
@@ -44,7 +45,7 @@ G_DEFINE_TYPE (GrubChooseDefaultWindow, grub_choose_default_window, GTK_TYPE_DIA
 typedef struct _GrubChooseDefaultWindowPrivate GrubChooseDefaultWindowPrivate;
 
 struct _GrubChooseDefaultWindowPrivate {
-  GrubChooseDefaultButtonBox * box;
+  GrubChooseDefaultWidget * box;
 };
 
 static void
@@ -103,8 +104,9 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_widget_show (scrolled);
 
-  priv->box = grub_choose_default_button_box_new ();
+  priv->box = GRUB_CHOOSE_DEFAULT_WIDGET (grub_choose_default_button_box_new ());
   g_signal_connect (priv->box, "selected", G_CALLBACK (handle_selected), self);
+  g_object_set (priv->box, "auto-commit", TRUE, NULL);
 
   gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (scrolled), GTK_WIDGET (priv->box));
   gtk_widget_show (GTK_WIDGET (priv->box));
@@ -129,7 +131,7 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 /***************/
 
 static void
-handle_selected (GrubChooseDefaultButtonBox *bbox, const gchar * entry, gpointer data)
+handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer data)
 {
   GrubChooseDefaultWindow *win = GRUB_CHOOSE_DEFAULT_WINDOW (data);
 

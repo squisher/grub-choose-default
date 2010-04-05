@@ -43,14 +43,14 @@ typedef struct
   guint signals[GRUB_CHOOSE_DEFAULT_WIDGET_LAST_SIGNAL];
 
   /* public functions */
-  gboolean (*commit) (GrubChooseDefaultWidget * widget);
+  gboolean (*commit) (GrubChooseDefaultWidget * widget, GError **error);
 
   /* signals */
   void (*selected) (gchar * entry);
 } GrubChooseDefaultWidgetInterface;
 
 GType grub_choose_default_widget_get_type (void);
-gboolean grub_choose_default_widget_commit (GrubChooseDefaultWidget * widget);
+gboolean grub_choose_default_widget_commit (GrubChooseDefaultWidget * widget, GError **error);
 
 G_END_DECLS
 

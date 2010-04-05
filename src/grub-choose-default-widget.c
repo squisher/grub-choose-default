@@ -33,7 +33,7 @@ grub_choose_default_widget_init (gpointer g_iface)
                                                               NULL,
                                                               G_PARAM_READWRITE));
     g_object_interface_install_property (g_iface,
-                                         g_param_spec_string ("auto-commit",
+                                         g_param_spec_boolean ("auto-commit",
                                                               "Auto-commit",
                                                               "Auto-commit selections",
                                                               FALSE,
@@ -71,9 +71,9 @@ grub_choose_default_widget_get_type (void)
 /* public */
 
 gboolean
-grub_choose_default_widget_commit (GrubChooseDefaultWidget * widget)
+grub_choose_default_widget_commit (GrubChooseDefaultWidget * widget, GError **error)
 {
   g_return_val_if_fail (GRUB_CHOOSE_DEFAULT_IS_WIDGET (widget), FALSE);
 
-  return GRUB_CHOOSE_DEFAULT_WIDGET_GET_INTERFACE (widget)->commit (widget);
+  return GRUB_CHOOSE_DEFAULT_WIDGET_GET_INTERFACE (widget)->commit (widget, error);
 }
