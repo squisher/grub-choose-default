@@ -153,8 +153,8 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 
   if (n_entries == -1)
   {
-    /* FIXME: show error in gui */
-    g_warning (error->message);
+    grub_choose_default_error (gtk_widget_get_toplevel (GTK_WIDGET (self)),
+                               error);
     g_error_free (error);
 
     return;
@@ -164,8 +164,8 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 
   if (def_entry == NULL)
   {
-    /* FIXME: show error in gui */
-    g_warning (error->message);
+    grub_choose_default_error (gtk_widget_get_toplevel (GTK_WIDGET (self)),
+                                error);
     g_error_free (error);
 
     return;
@@ -264,8 +264,8 @@ commit (GrubChooseDefaultWidget * widget, GError **report_error)
 
   if (report_error == NULL)
   {
-    g_critical ("%s\n", my_error->message);
-    grub_choose_default_error (NULL, my_error);
+    grub_choose_default_error (gtk_widget_get_toplevel (GTK_WIDGET (widget)),
+                               my_error);
     g_error_free (my_error);
   }
 

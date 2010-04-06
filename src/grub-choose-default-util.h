@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-void grub_choose_default_error (GtkWindow *parent, GError *error);
+void grub_choose_default_error (GtkWidget *parent, GError *error);
 
 G_END_DECLS
 

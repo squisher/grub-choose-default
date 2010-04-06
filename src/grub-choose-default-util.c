@@ -19,15 +19,17 @@
 #include "grub-choose-default-util.h"
 
 void
-grub_choose_default_error (GtkWindow *parent, GError *error)
+grub_choose_default_error (GtkWidget *parent, GError *error)
 {
   GtkWidget *dialog;
 
-  dialog = gtk_message_dialog_new (parent,
+  dialog = gtk_message_dialog_new (GTK_WINDOW (parent),
                                    GTK_DIALOG_MODAL,
                                    GTK_MESSAGE_ERROR,
                                    GTK_BUTTONS_CLOSE,
                                    "%s", error->message);
+
+  g_warning ("%s", error->message);
 
   gtk_dialog_run (GTK_DIALOG (dialog));
 }
