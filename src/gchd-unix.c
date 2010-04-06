@@ -17,6 +17,9 @@
  */
 
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+
 #include "gchd-unix.h"
 
 static const gchar * default_key = "saved_entry";
@@ -97,17 +100,29 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
   /* Execute:
    * grub-set-default $entry
    */
-  gchar * argv [3];
+  gchar * argv [4];
   gchar * s_output;
   gchar * s_error;
   gint exit_status;
   gboolean r;
+  gint i;
 
   g_assert (entry != NULL);
 
-  argv[0] = "grub-set-default";
-  argv[1] = entry;
-  argv[2] = NULL;
+  if (geteuid() != 0)
+  {
+    argv[0] = "sudo";
+    i = 1;
+    g_debug ("Using sudo to set default entry");
+  }
+  else
+  {
+    i = 0;
+  }
+
+  argv[i++] = "grub-set-default";
+  argv[i++] = entry;
+  argv[i++] = NULL;
 
   r = g_spawn_sync (NULL,
                 argv,
