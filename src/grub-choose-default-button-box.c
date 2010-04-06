@@ -237,12 +237,12 @@ button_clicked (GtkButton *button, gpointer user_data)
 
   g_debug ("Pressed %s", label);
 
-  g_signal_emit (bbox, widget_class->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED], 0, label);
-
   if (priv->autocommit)
   {
     commit (GRUB_CHOOSE_DEFAULT_WIDGET (bbox), NULL);
   }
+
+  g_signal_emit (bbox, widget_class->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED], 0, label);
 }
 
 static gboolean
