@@ -20,12 +20,14 @@
 #include "grub-choose-default-window.h"
 #include "grub-choose-default-widget.h"
 #include "grub-choose-default-button-box.h"
+#include "grub-choose-default-util.h"
+#include "gchd-error.h"
 
 /*- private prototypes -*/
 
 static void update_reboot (GrubChooseDefaultWindow *win);
 static void perform_reboot (GrubChooseDefaultWindow *win);
-static gboolean tryandrun (GrubChooseDefaultWindow *win, const gchar * directory);
+static gboolean tryandrun (GrubChooseDefaultWindow *win, const gchar * directory, const gchar * script);
 static void handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer data);
 static void handle_cancel (GtkButton *button, gpointer data);
 static void handle_reboot (GtkToggleButton *button, gpointer data);
@@ -134,7 +136,6 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 
 
   area = gtk_dialog_get_action_area (GTK_DIALOG (self));
-  g_debug ("action area class: %s", G_OBJECT_CLASS_NAME (G_OBJECT_GET_CLASS (area)));
 
   priv->check_reboot = check_reboot = gtk_check_button_new_with_label ("Logout / Reboot immediately");
   update_reboot (self);
@@ -179,17 +180,17 @@ update_reboot (GrubChooseDefaultWindow *win)
 }
 
 static gboolean
-tryandrun (GrubChooseDefaultWindow *win, const gchar * directory)
+tryandrun (GrubChooseDefaultWindow *win, const gchar * directory, const gchar * script)
 {
-  gchar * script;
+  gchar * path;
 
-  script = g_build_filename (directory, "grub-choose-default", "reboot", NULL);
+  path = g_build_filename (directory, script, NULL);
 
-  g_debug ("Looking for reboot script %s\n", script);
+  g_debug ("Looking for reboot script %s\n", path);
 
-  if (g_file_test (script, G_FILE_TEST_IS_EXECUTABLE))
+  if (g_file_test (path, G_FILE_TEST_IS_EXECUTABLE))
   {
-    gchar *argv[] = { script, NULL };
+    gchar *argv[] = { path, NULL };
     GError * error = NULL;
     gboolean r;
 
@@ -221,19 +222,36 @@ perform_reboot (GrubChooseDefaultWindow *win)
 
   gboolean r;
   const gchar * const * config_dirs;
-  //const gchar * config_dir;
+  const gchar * config_dir;
+  gchar * script;
+  GError *error = NULL;
 
-  r = tryandrun (win, g_get_user_config_dir ());
+  script = g_build_filename ("grub-choose-default", "reboot", NULL);
+
+  config_dir = g_get_user_config_dir ();
+
+  r = tryandrun (win, config_dir, script);
 
   if (r)
     return;
 
   for (config_dirs = g_get_system_config_dirs (); *config_dirs != NULL; config_dirs++)
   {
-    r = tryandrun (win, *config_dirs);
+    r = tryandrun (win, *config_dirs, script);
     if (r)
       break;
   }
+
+  /* we found no script */
+
+  g_set_error (&error,
+               GCHD_ERROR, GCHD_ERROR_NO_REBOOT_SCRIPT,
+               "Could not find any reboot scripts.\nYou can install one in %s/%s.",
+               config_dir, script);
+  grub_choose_default_error (GTK_WIDGET (win), error);
+  g_error_free (error);
+
+  g_free (script);
 }
 
 static void

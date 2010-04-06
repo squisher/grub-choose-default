@@ -10,6 +10,7 @@ typedef enum
   GCHD_ERROR_NONE,
   GCHD_ERROR_CFG_NOT_FOUND,
   GCHD_ERROR_CFG_NOT_READABLE,
+  GCHD_ERROR_NO_REBOOT_SCRIPT,
 } GchdError;
 
 #define GCHD_ERROR gchd_error_quark ()
