@@ -262,7 +262,7 @@ commit (GrubChooseDefaultWidget * widget, GError **report_error)
 
   r = gchd_set_default_entry (priv->gchd, priv->def_entry, error);
 
-  if (report_error == NULL)
+  if (!r && report_error == NULL)
   {
     grub_choose_default_error (gtk_widget_get_toplevel (GTK_WIDGET (widget)),
                                my_error);
