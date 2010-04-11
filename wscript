@@ -33,16 +33,10 @@ def build (ctx):
   #ctx.recurse ('src')
   ctx.add_subdirs ('src')
 
-#   ctx.new_task_gen (
-#       features = 'subst',
-#       source = 'grub-choose-default.sgml',
-#       target = 'grub-choose-default.8',
-#       dict = { 'VERSION' : VERSION },
-#       install_path = '${MANDIR}/man8'
-#   )
-  ctx(
-      rule = 'docbook-to-man ${SRC} > ${TGT}',
-      source = 'grub-choose-default.sgml',
-      target = 'grub-choose-default.8',
-      install_path = '${MANDIR}/man8',
-      )
+  if Options.platform != 'win32':
+    ctx(
+        rule = 'docbook-to-man ${SRC} > ${TGT}',
+        source = 'grub-choose-default.sgml',
+        target = 'grub-choose-default.8',
+        install_path = '${MANDIR}/man8',
+        )
