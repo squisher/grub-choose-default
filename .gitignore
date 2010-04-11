@@ -1,2 +1,4 @@
 grub-choose-default.8
 _build_
+.waf-*/
+.lock-wscript
