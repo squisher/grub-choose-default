@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+COMMON = ('gchd-error.c', 'gchd-unix.c', 'gchd-menu.c', 'gchd.c')
+
+gchd =  bld (features = 'cc cprogram',
+             includes = '# .',
+             uselib = 'GTK',
+             target = 'grub-choose-default')
+
+gchd.source = COMMON + ('grub-choose-default-button-box.c', 
+                        'grub-choose-default-main.c', 
+                        'grub-choose-default-util.c', 
+                        'grub-choose-default-widget.c', 
+                        'grub-choose-default-window.c',
+                       )
+
+test =  bld (features = 'cc cprogram',
+             includes = '# .',
+             uselib = 'GTK',
+             target = 'gchd-test')
+
+test.source = COMMON + ('gchd-test.c',
+                       )
