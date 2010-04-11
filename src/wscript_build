@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 
-COMMON = ('gchd-error.c', 'gchd-unix.c', 'gchd-menu.c', 'gchd.c')
+import Options
+
+COMMON = ('gchd-error.c', 'gchd-menu.c', 'gchd.c')
+
+if Options.platform != 'win32':
+  COMMON += ('gchd-unix.c',)
+else:
+  COMMON += ('gchd-windows.c',)
 
 gchd =  bld (features = 'cc cprogram',
              includes = '# .',
