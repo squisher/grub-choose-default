@@ -27,8 +27,8 @@ static const gchar * default_key = "saved_entry";
 
 /* prototypes */
 
-gchar * get_default_entry (Gchd * gchd, GError **error);
-gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
+static gchar * get_default_entry (Gchd * gchd, GError **error);
+static gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
 
 
 /* implementations */
@@ -36,11 +36,13 @@ gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
 void
 gcd_unix_init (Gchd * gchd)
 {
+  g_debug ("Using unix utilities to set and get default entries");
+
   gchd->get_default_entry = get_default_entry;
   gchd->set_default_entry = set_default_entry;
 }
 
-gchar *
+static gchar *
 get_default_entry (Gchd * gchd, GError **error)
 {
   /* Essentially run this pipeline:
@@ -94,7 +96,7 @@ get_default_entry (Gchd * gchd, GError **error)
   return default_entry;
 }
 
-gboolean
+static gboolean
 set_default_entry (Gchd * gchd, gchar * entry, GError **error)
 {
   /* Execute:

@@ -12,6 +12,12 @@ VERSION = '0.7'
 def set_options (opt):
   opt.add_option ('--debug', action='store_true', default=False, help='Enable debugging code', dest='debug')
 
+  if Options.platform == 'win32':
+    def_direct = True
+  else:
+    def_direct = False
+  opt.add_option ('--direct', action='store_true', default=def_direct, help='Directly work on grubenv, default under win32', dest='direct')
+
 def configure (ctx):
   print "Configuring", APPNAME 
 
@@ -25,6 +31,8 @@ def configure (ctx):
 
   ctx.define ('VERSION', VERSION)
   ctx.define ('PACKAGE', APPNAME)
+  ctx.define ('DIRECT', 1 if Options.options.direct else 0)
+
 
   ctx.env.append_value ('CCFLAGS', '-DHAVE_CONFIG_H')
 

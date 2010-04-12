@@ -2,12 +2,7 @@
 
 import Options
 
-COMMON = ('gchd-error.c', 'gchd-menu.c', 'gchd.c')
-
-if Options.platform != 'win32':
-  COMMON += ('gchd-unix.c',)
-else:
-  COMMON += ('gchd-windows.c',)
+COMMON = ('gchd-error.c', 'gchd-menu.c', 'gchd.c', 'gchd-unix.c', 'gchd-direct.c')
 
 gchd =  bld (features = 'cc cprogram',
              includes = '# .',

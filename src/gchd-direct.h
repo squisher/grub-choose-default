@@ -15,8 +15,8 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _HAVE_GCHD_WINDOWS
-#define _HAVE_GCHD_WINDOWS
+#ifndef _HAVE_GCHD_DIRECT
+#define _HAVE_GCHD_DIRECT
 
 #include <glib.h>
 #include "gchd-internal.h"
@@ -24,8 +24,8 @@
 
 G_BEGIN_DECLS
 
-void gcd_windows_init (Gchd * gchd);
+void gcd_direct_init (Gchd * gchd);
 
 G_END_DECLS
 
-#endif /* _HAVE_GCHD_WINDOWS */
+#endif /* _HAVE_GCHD_DIRECT */

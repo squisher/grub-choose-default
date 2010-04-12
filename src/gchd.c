@@ -18,13 +18,14 @@
 
 #include <glib.h>
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include "gchd.h"
 #include "gchd-menu.h"
-#ifdef __WIN32
-#  include "gchd-windows.h"
-#else
-#  include "gchd-unix.h"
-#endif
+#include "gchd-direct.h"
+#include "gchd-unix.h"
 
 Gchd *
 gchd_new (void)
@@ -33,8 +34,8 @@ gchd_new (void)
   
   gchd = g_new0 (Gchd, 1);
 
-#ifdef __WIN32
-  gcd_windows_init (gchd);
+#if DIRECT==1
+  gcd_direct_init (gchd);
 #else
   gcd_unix_init (gchd);
 #endif

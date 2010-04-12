@@ -16,9 +16,36 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "gchd-windows.h"
+#include "gchd-direct.h"
+
+static const gchar * default_key = "saved_entry";
+
+
+/* prototypes */
+
+static gchar * get_default_entry (Gchd * gchd, GError **error);
+static gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
+
+
+/* implementations */
 
 void
-gcd_windows_init (Gchd * gchd)
+gcd_direct_init (Gchd * gchd)
 {
+  g_debug ("Using direct method to set and get default entries");
+
+  gchd->get_default_entry = get_default_entry;
+  gchd->set_default_entry = set_default_entry;
+}
+
+static gchar *
+get_default_entry (Gchd * gchd, GError **error)
+{
+  g_critical ("not implemented yet");
+}
+
+static gboolean
+set_default_entry (Gchd * gchd, gchar * entry, GError **error)
+{
+  g_critical ("not implemented yet");
 }
