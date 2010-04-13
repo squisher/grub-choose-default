@@ -17,35 +17,102 @@
  */
 
 #include "gchd-direct.h"
+#include "grub-envblk.h"
+#include "gchd-error.h"
 
 static const gchar * default_key = "saved_entry";
+static gchar * default_entry = NULL;
+static const gchar * env_filename = "/boot/grub/grubenv";
+
+typedef struct {
+  gchar * contents;
+  grub_envblk_t env;
+} GchdDirectPrivate;
+
+#define GCHD_DIRECT_PRIVATE(x) ((GchdDirectPrivate *)(x))
 
 
 /* prototypes */
 
 static gchar * get_default_entry (Gchd * gchd, GError **error);
 static gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
+static int find (const char *name, const char *value);
 
 
 /* implementations */
 
 void
-gcd_direct_init (Gchd * gchd)
+gchd_direct_init (Gchd * gchd)
 {
   g_debug ("Using direct method to set and get default entries");
 
   gchd->get_default_entry = get_default_entry;
   gchd->set_default_entry = set_default_entry;
+
+  gchd->data = (gpointer) g_new0 (GchdDirectPrivate, 1);
 }
 
 static gchar *
 get_default_entry (Gchd * gchd, GError **error)
 {
-  g_critical ("not implemented yet");
+  GchdDirectPrivate *priv = GCHD_DIRECT_PRIVATE (gchd->data);
+
+  gboolean r;
+  gsize len;
+
+  r = g_file_get_contents (env_filename, &(priv->contents), &len, error);
+
+  if (!r)
+    return;
+
+  priv->env = grub_envblk_open (priv->contents, len);
+
+  grub_envblk_iterate (priv->env, find);
+
+  return default_entry;
 }
 
 static gboolean
 set_default_entry (Gchd * gchd, gchar * entry, GError **error)
 {
-  g_critical ("not implemented yet");
+  GchdDirectPrivate *priv = GCHD_DIRECT_PRIVATE (gchd->data);
+
+  gint r;
+  gboolean b;
+
+  r = grub_envblk_set (priv->env, default_key, entry);
+
+  if (!r)
+  {
+    g_set_error (error,
+                 GCHD_ERROR, GCHD_ERROR_FAILED_SETTING_ENTRY,
+                 "Failed to set entry");
+    return FALSE;
+  }
+
+  b = g_file_set_contents (env_filename,
+                           grub_envblk_buffer (priv->env),
+                           grub_envblk_size (priv->env),
+                           error);
+
+  if (!b)
+  {
+    g_set_error (error,
+                 GCHD_ERROR, GCHD_ERROR_FAILED_WRITING_ENV,
+                 "Failed to write env");
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static int
+find (const char *name, const char *value)
+{
+  if (strcmp (name, default_key) == 0)
+  {
+    default_entry = g_strdup (value);
+    return TRUE;
+  }
+  return FALSE; 
 }

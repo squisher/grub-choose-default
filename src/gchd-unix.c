@@ -34,7 +34,7 @@ static gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
 /* implementations */
 
 void
-gcd_unix_init (Gchd * gchd)
+gchd_unix_init (Gchd * gchd)
 {
   g_debug ("Using unix utilities to set and get default entries");
 

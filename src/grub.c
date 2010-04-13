@@ -15,16 +15,17 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _HAVE_GCHD_UNIX
-#define _HAVE_GCHD_UNIX
 
-#include <glib.h>
-#include "gchd-internal.h"
+#include "grub.h"
 
-G_BEGIN_DECLS
+void *
+grub_memset (void *s, int c, grub_size_t n)
+{
+  unsigned char *p = (unsigned char *) s;
 
-void gchd_unix_init (Gchd * gchd);
+  while (n--)
+    *p++ = (unsigned char) c;
 
-G_END_DECLS
+  return s;
+}
 
-#endif /* _HAVE_GCHD_UNIX */

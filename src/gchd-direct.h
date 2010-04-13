@@ -24,7 +24,7 @@
 
 G_BEGIN_DECLS
 
-void gcd_direct_init (Gchd * gchd);
+void gchd_direct_init (Gchd * gchd);
 
 G_END_DECLS
 

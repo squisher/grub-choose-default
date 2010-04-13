@@ -35,9 +35,9 @@ gchd_new (void)
   gchd = g_new0 (Gchd, 1);
 
 #if DIRECT==1
-  gcd_direct_init (gchd);
+  gchd_direct_init (gchd);
 #else
-  gcd_unix_init (gchd);
+  gchd_unix_init (gchd);
 #endif
 
   return gchd;
