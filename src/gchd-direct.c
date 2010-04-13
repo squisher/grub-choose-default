@@ -22,7 +22,7 @@
 
 static const gchar * default_key = "saved_entry";
 static gchar * default_entry = NULL;
-static const gchar * env_filename = "/boot/grub/grubenv";
+static gchar * env_filename;
 
 typedef struct {
   gchar * contents;
@@ -60,6 +60,8 @@ get_default_entry (Gchd * gchd, GError **error)
 
   gboolean r;
   gsize len;
+
+  env_filename = g_build_filename ("/", "boot", "grub", "grubenv", NULL);
 
   r = g_file_get_contents (env_filename, &(priv->contents), &len, error);
 
