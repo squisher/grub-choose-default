@@ -2,7 +2,12 @@
 
 import Options
 
-COMMON = ('gchd-error.c', 'gchd-menu.c', 'gchd.c', 'gchd-unix.c', 'gchd-direct.c', 'grub-envblk.c', 'grub.c')
+COMMON = ('gchd-error.c', 'gchd-menu.c', 'gchd.c', 'grub-envblk.c', 'grub.c')
+
+if bld.env['DIRECT'] == 1:
+  COMMON += ('gchd-direct.c',)
+else:
+  COMMON += ('gchd-unix.c',)
 
 gchd =  bld (features = 'cc cprogram',
              includes = '# .',
