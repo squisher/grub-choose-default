@@ -29,5 +29,7 @@ main (int argc, char **argv)
 
   gtk_dialog_run (GTK_DIALOG (win));
 
+  gtk_widget_destroy (GTK_WIDGET (win));
+
   return 0;
 }

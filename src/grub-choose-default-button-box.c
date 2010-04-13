@@ -153,8 +153,7 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 
   if (n_entries == -1)
   {
-    grub_choose_default_error (gtk_widget_get_toplevel (GTK_WIDGET (self)),
-                               error);
+    grub_choose_default_error (NULL, error);
     g_error_free (error);
 
     return;
@@ -164,8 +163,7 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 
   if (def_entry == NULL)
   {
-    grub_choose_default_error (gtk_widget_get_toplevel (GTK_WIDGET (self)),
-                                error);
+    grub_choose_default_error (NULL, error);
     g_error_free (error);
 
     return;

@@ -24,7 +24,7 @@ grub_choose_default_error (GtkWidget *parent, GError *error)
   GtkWidget *dialog;
 
   dialog = gtk_message_dialog_new (GTK_WINDOW (parent),
-                                   GTK_DIALOG_MODAL,
+                                   (parent != NULL) ? GTK_DIALOG_MODAL : 0,
                                    GTK_MESSAGE_ERROR,
                                    GTK_BUTTONS_CLOSE,
                                    "%s", error->message);
@@ -32,5 +32,7 @@ grub_choose_default_error (GtkWidget *parent, GError *error)
   g_warning ("%s", error->message);
 
   gtk_dialog_run (GTK_DIALOG (dialog));
+
+  gtk_widget_destroy (dialog);
 }
 

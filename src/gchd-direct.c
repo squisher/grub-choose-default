@@ -63,13 +63,12 @@ get_default_entry (Gchd * gchd, GError **error)
 
   env_filename = g_build_filename ("/", "boot", "grub", "grubenv", NULL);
 
+  g_message ("Operating on %s", env_filename);
+
   r = g_file_get_contents (env_filename, &(priv->contents), &len, error);
 
   if (!r)
   {
-    g_set_error (error,
-                 GCHD_ERROR, GCHD_ERROR_FAILED_READING_ENV,
-                 "Failed to read the grub environment");
     return NULL;
   }
 
