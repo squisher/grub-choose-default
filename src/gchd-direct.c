@@ -52,6 +52,7 @@ gchd_direct_init (Gchd * gchd)
   gchd->data = (gpointer) g_new0 (GchdDirectPrivate, 1);
 }
 
+/* this method is NOT thread safe */
 static gchar *
 get_default_entry (Gchd * gchd, GError **error)
 {
@@ -63,11 +64,28 @@ get_default_entry (Gchd * gchd, GError **error)
   r = g_file_get_contents (env_filename, &(priv->contents), &len, error);
 
   if (!r)
-    return;
+  {
+    g_set_error (error,
+                 GCHD_ERROR, GCHD_ERROR_FAILED_READING_ENV,
+                 "Failed to read the grub environment");
+    return NULL;
+  }
 
   priv->env = grub_envblk_open (priv->contents, len);
 
+  if (priv->env == NULL)
+  {
+    g_critical ("Unable to parse the grub environment");
+
+    return NULL;
+  }
+
   grub_envblk_iterate (priv->env, find);
+
+  if (default_entry == NULL)
+  {
+    g_warning ("Could not find the default entry");
+  }
 
   return default_entry;
 }
