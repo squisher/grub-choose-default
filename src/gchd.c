@@ -24,8 +24,11 @@
 
 #include "gchd.h"
 #include "gchd-menu.h"
-#include "gchd-direct.h"
-#include "gchd-unix.h"
+#if DIRECT==1
+#  include "gchd-direct.h"
+#else
+#  include "gchd-unix.h"
+#endif
 
 Gchd *
 gchd_new (void)
