@@ -38,7 +38,10 @@ struct _Gchd {
 
   GchdMenu menu;
   gchar * default_entry;
+  const gchar * grub_dir;
 };
+
+gchar * gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error);
 
 G_END_DECLS
 

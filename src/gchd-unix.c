@@ -16,11 +16,14 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <config.h>
+
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 
 #include "gchd-unix.h"
+#include "gchd-util.h"
 
 static const gchar * default_key = "saved_entry";
 
@@ -36,7 +39,7 @@ static gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
 void
 gchd_unix_init (Gchd * gchd)
 {
-  g_debug ("Using unix utilities to set and get default entries");
+  DBG ("Using unix utilities to set and get default entries");
 
   gchd->get_default_entry = get_default_entry;
   gchd->set_default_entry = set_default_entry;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010     David Mohr <david@mcbf.net>
+ * Copyright (c) 2009     David Mohr <david@mcbf.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -15,17 +15,28 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _HAVE_GCHD_MENU
-#define _HAVE_GCHD_MENU
+
+#include <config.h>
 
 #include <glib.h>
-#include "gchd-internal.h"
+#include <stdarg.h>
+#include <stdio.h>
 
-G_BEGIN_DECLS
+#include "gchd-util.h"
 
-gboolean gchd_get_menu (Gchd * gchd, GError **error);
-void gchd_menu_free (GchdMenu *menu);
+void
+gchd_debug_print (char * file, int line, char * fmt, ...)
+{
+#ifdef DEBUG
+  va_list args;
+  gchar * fullfmt;
 
-G_END_DECLS
+  fullfmt = g_strdup_printf ("%s %s:%d %s\n", PACKAGE, file, line, fmt);
 
-#endif /* _HAVE_GCHD_MENU */
+  va_start (args, fmt);
+  vfprintf (stderr, fullfmt, args);
+  va_end (args);
+
+  g_free (fullfmt);
+#endif
+}

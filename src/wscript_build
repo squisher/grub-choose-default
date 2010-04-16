@@ -2,8 +2,9 @@
 
 import Options
 
-COMMON = ('gchd-error.c', 'gchd-menu.c', 'gchd.c', 'grub-envblk.c', 'grub.c')
+COMMON = ('gchd-error.c', 'gchd-menu.c', 'gchd.c', 'grub-envblk.c', 'grub.c', 'gchd-util.c')
 
+#print " ==> ", bld.env
 if bld.env['DIRECT'] == 1:
   COMMON += ('gchd-direct.c',)
 else:

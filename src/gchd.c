@@ -16,19 +16,26 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <config.h>
+
 #include <glib.h>
 
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
-
 #include "gchd.h"
+#include "gchd-error.h"
 #include "gchd-menu.h"
+#include "gchd-util.h"
 #if DIRECT==1
 #  include "gchd-direct.h"
 #else
 #  include "gchd-unix.h"
 #endif
+
+static const gchar * grub_config_locations[] = {
+  "/boot/grub",
+  "/grub",
+  NULL
+};
+
 
 Gchd *
 gchd_new (void)
@@ -49,9 +56,7 @@ gchd_new (void)
 void
 gchd_free (Gchd *gchd)
 {
-  g_free (gchd->menu.loc);
-  g_list_foreach (gchd->menu.entries, (GFunc) g_free, NULL);
-  g_list_free (gchd->menu.entries);
+  gchd_menu_free (&(gchd->menu));
 
   g_free (gchd);
 }
@@ -63,7 +68,7 @@ gchd_get_menu_entries (Gchd *gchd, GList **entries, GError **error)
 
   g_assert (entries != NULL);
 
-  r = gchd_get_menu (&(gchd->menu), error);
+  r = gchd_get_menu (gchd, error);
 
   if (r)
   {
@@ -77,6 +82,51 @@ gchd_get_menu_entries (Gchd *gchd, GList **entries, GError **error)
     return -1;
   }
 }
+
+gchar *
+gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
+{
+  gchar * cfg;
+  const gchar ** base;
+  gboolean r;
+
+  g_assert (error == NULL || *error == NULL);
+  g_assert (file != NULL);
+
+  for (base = grub_config_locations; *base != NULL; base++)
+  {
+    cfg = g_build_filename (*base, file, NULL);
+
+    DBG ("Looking for %s...", cfg);
+
+    r = g_file_test (cfg, G_FILE_TEST_EXISTS);
+
+    if (r)
+    {
+      break;
+    }
+
+    g_free (cfg);
+  }
+
+  if (r)
+  {
+    /* we found a file */
+    gchd->grub_dir = *base;
+    return cfg;
+  }
+  else
+  {
+    /* no file found */
+    g_set_error (error, GCHD_ERROR,
+                 GCHD_ERROR_FILE_NOT_FOUND,
+                 "Could not find %s", file);
+    return NULL;
+  }
+}
+
+
+/* interface functions */
 
 gchar *
 gchd_get_default_entry (Gchd * gchd, GError **error)

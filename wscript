@@ -32,11 +32,13 @@ def configure (ctx):
   ctx.define ('VERSION', VERSION)
   ctx.define ('PACKAGE', APPNAME)
   ctx.define ('DIRECT', 1 if Options.options.direct else 0)
-
-
-  ctx.env.append_value ('CCFLAGS', '-DHAVE_CONFIG_H')
+  ctx.define ('DEBUG', 1 if Options.options.debug else 0)
 
   ctx.write_config_header ('config.h')
+  ctx.env.append_value ('CCDEFINES', ['HAVE_CONFIG_H=1'])
+
+  if Options.options.debug:
+    ctx.env.append_value ('CCFLAGS', '-Wall -O0 -g'.split ())
 
 def build (ctx):
   #ctx.recurse ('src')
