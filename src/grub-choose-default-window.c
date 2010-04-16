@@ -17,6 +17,12 @@
  *  
  */
 
+#include <config.h>
+
+#if HAVE_STRING_H
+#  include <string.h>
+#endif
+
 #include "grub-choose-default-window.h"
 #include "grub-choose-default-widget.h"
 #include "grub-choose-default-button-box.h"
@@ -184,21 +190,64 @@ static gboolean
 tryandrun (GrubChooseDefaultWindow *win, const gchar * directory, const gchar * script)
 {
   gchar * path;
+#ifdef G_OS_WIN32
+  GDir * dir;
+  const gchar * fn;
+  gchar * dirname, * basename;
+#endif
 
   path = g_build_filename (directory, script, NULL);
+
+#ifdef G_OS_WIN32
+  dirname = g_path_get_dirname (path);
+  basename = g_path_get_basename (path);
+  g_free (path);
+
+  dir = g_dir_open (dirname, 0, NULL);
+
+  if (dir == NULL)
+    return FALSE;
+
+  while ((fn = g_dir_read_name (dir)) != NULL)
+  {
+    DBG ("Considering file %s", fn);
+    if (g_str_has_prefix (fn, basename))
+    {
+      DBG (" -> has prefix %s", basename);
+      path = g_build_filename (dirname, fn, NULL);
+
+      break;
+    }
+  }
+  g_dir_close (dir);
+#endif
 
   g_print ("Looking for reboot script %s\n", path);
 
   if (g_file_test (path, G_FILE_TEST_IS_EXECUTABLE))
   {
-    gchar *argv[] = { path, NULL };
+    gchar *argv[3];
     GError * error = NULL;
     gboolean r;
+
+#ifdef G_OS_WIN32
+    if (g_str_has_suffix (path, ".vbs"))
+    {
+      argv[0] = "cscript.exe";
+      argv[1] = path;
+      argv[2] = NULL;
+    }
+    else
+#endif
+    {
+      argv[0] = path;
+      argv[1] = NULL;
+    }
 
     r = g_spawn_async (NULL,
                        argv,
                        NULL,
-                       0,
+                       G_SPAWN_SEARCH_PATH,
                        NULL,
                        NULL,
                        NULL,
@@ -210,9 +259,11 @@ tryandrun (GrubChooseDefaultWindow *win, const gchar * directory, const gchar * 
       g_error_free (error);
     }
 
+    g_free (path);
     return r;
   }
 
+  g_free (path);
   return FALSE;
 }
 
