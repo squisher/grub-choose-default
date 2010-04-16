@@ -31,7 +31,10 @@ gchd_debug_print (char * file, int line, char * fmt, ...)
   va_list args;
   gchar * fullfmt;
 
-  fullfmt = g_strdup_printf ("%s %s:%d %s\n", PACKAGE, file, line, fmt);
+  /* waf compiles files from within the build directory,
+   * introducing ../ to every file name. Let's cut that off
+   */
+  fullfmt = g_strdup_printf ("%s:%d %s\n", file+3, line, fmt);
 
   va_start (args, fmt);
   vfprintf (stderr, fullfmt, args);

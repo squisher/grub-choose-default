@@ -29,7 +29,6 @@
 
 static const gchar * default_key = "saved_entry";
 static gchar * default_entry = NULL;
-static gchar * env_filename;
 
 typedef struct {
   gchar * contents;
@@ -67,10 +66,14 @@ get_default_entry (Gchd * gchd, GError **error)
 
   gboolean r;
   gsize len;
+  gchar * env_filename;
 
-  env_filename = g_build_filename ("/", "boot", "grub", "grubenv", NULL);
+  env_filename = gchd_get_grub_file (gchd, "grubenv", error);
 
-  g_message ("Operating on %s", env_filename);
+  if (env_filename == NULL)
+    return NULL;
+
+  g_print ("Operating on %s\n", env_filename);
 
   r = g_file_get_contents (env_filename, &(priv->contents), &len, error);
 
@@ -105,6 +108,9 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
 
   gint r;
   gboolean b;
+  gchar * env_filename;
+
+  env_filename = gchd_get_grub_file (gchd, "grubenv", error);
 
   r = grub_envblk_set (priv->env, default_key, entry);
 

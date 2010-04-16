@@ -38,7 +38,7 @@
 #endif
 
 static const gchar * grub_config_locations[] = {
-  "boot/grub",
+  "boot" G_DIR_SEPARATOR_S "grub",
   "grub",
   NULL
 };
@@ -65,6 +65,7 @@ gchd_free (Gchd *gchd)
 {
   gchd_menu_free (&(gchd->menu));
 
+  g_free (gchd->grub_dir);
   g_free (gchd);
 }
 
@@ -116,7 +117,7 @@ gchd_get_grub_file_from_root (Gchd * gchd, const gchar * root, const gchar * fil
   if (r)
   {
     /* we found a file */
-    gchd->grub_dir = *base;
+    gchd->grub_dir = g_build_filename (root, *base, NULL);
     return cfg;
   }
   else
@@ -141,6 +142,13 @@ gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
 
   g_assert (error == NULL || *error == NULL);
   g_assert (file != NULL);
+
+  if (gchd->grub_dir)
+  {
+    /* if we have the directory cached, then no need to find it again */
+
+    return g_build_filename (gchd->grub_dir, file, NULL);
+  }
 
 #ifdef G_OS_WIN32
   volmon = g_volume_monitor_get ();
@@ -176,7 +184,7 @@ gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
       cfg = gchd_get_grub_file_from_root (gchd, root, file, error);
 
       g_free (root);
-      g_object_unref (root);
+      g_object_unref (f_root);
     }
     else
     {
