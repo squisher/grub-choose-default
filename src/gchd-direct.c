@@ -16,9 +16,16 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <config.h>
+
+#ifdef HAVE_STRING_H 
+#  include <string.h>
+#endif
+
 #include "gchd-direct.h"
 #include "grub-envblk.h"
 #include "gchd-error.h"
+#include "gchd-util.h"
 
 static const gchar * default_key = "saved_entry";
 static gchar * default_entry = NULL;
@@ -44,7 +51,7 @@ static int find (const char *name, const char *value);
 void
 gchd_direct_init (Gchd * gchd)
 {
-  g_debug ("Using direct method to set and get default entries");
+  g_print ("Using direct method to set and get default entries\n");
 
   gchd->get_default_entry = get_default_entry;
   gchd->set_default_entry = set_default_entry;

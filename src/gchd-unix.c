@@ -39,7 +39,7 @@ static gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
 void
 gchd_unix_init (Gchd * gchd)
 {
-  DBG ("Using unix utilities to set and get default entries");
+  g_print ("Using unix utilities to set and get default entries\n");
 
   gchd->get_default_entry = get_default_entry;
   gchd->set_default_entry = set_default_entry;
@@ -118,7 +118,7 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
   {
     argv[0] = "sudo";
     i = 1;
-    g_debug ("Using sudo to set default entry");
+    g_print ("Using sudo to set default entry\n");
   }
   else
   {

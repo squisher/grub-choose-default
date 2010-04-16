@@ -18,6 +18,10 @@
 
 #include <config.h>
 
+#if HAVE_STRING_H
+#  include <string.h>
+#endif
+
 #include <glib.h>
 
 #include "gchd.h"
@@ -29,10 +33,13 @@
 #else
 #  include "gchd-unix.h"
 #endif
+#ifdef G_OS_WIN32
+#  include <gio/gio.h>
+#endif
 
 static const gchar * grub_config_locations[] = {
-  "/boot/grub",
-  "/grub",
+  "boot/grub",
+  "grub",
   NULL
 };
 
@@ -84,18 +91,15 @@ gchd_get_menu_entries (Gchd *gchd, GList **entries, GError **error)
 }
 
 gchar *
-gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
+gchd_get_grub_file_from_root (Gchd * gchd, const gchar * root, const gchar * file, GError **error)
 {
   gchar * cfg;
   const gchar ** base;
   gboolean r;
 
-  g_assert (error == NULL || *error == NULL);
-  g_assert (file != NULL);
-
   for (base = grub_config_locations; *base != NULL; base++)
   {
-    cfg = g_build_filename (*base, file, NULL);
+    cfg = g_build_filename (root, *base, file, NULL);
 
     DBG ("Looking for %s...", cfg);
 
@@ -123,6 +127,71 @@ gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
                  "Could not find %s", file);
     return NULL;
   }
+}
+
+gchar *
+gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
+{
+#ifdef G_OS_WIN32
+  GVolumeMonitor * volmon;
+  GList * mounts, * iter;
+#endif
+
+  gchar * cfg;
+
+  g_assert (error == NULL || *error == NULL);
+  g_assert (file != NULL);
+
+#ifdef G_OS_WIN32
+  volmon = g_volume_monitor_get ();
+  mounts = g_volume_monitor_get_mounts (volmon);
+
+  /* seems like gio returns the list in reverse order */
+  mounts = g_list_reverse (mounts);
+
+  cfg = NULL;
+  g_set_error (error, GCHD_ERROR,
+               GCHD_ERROR_NO_VOLUMES,
+               "No volumes were found in the system");
+
+  for (iter = mounts; iter != NULL && cfg == NULL; iter = g_list_next (iter))
+  {
+    GMount * mnt = iter->data;
+    GFile * f_root;
+    gchar * root;
+
+    f_root = g_mount_get_root (mnt);
+    root = g_file_get_path (f_root);
+
+    if (strcmp (root, "A:\\") != 0)
+    {
+      DBG ("Using root %s", root);
+
+      if (error && *error)
+      {
+        g_error_free (*error);
+        *error = NULL;
+      }
+
+      cfg = gchd_get_grub_file_from_root (gchd, root, file, error);
+
+      g_free (root);
+      g_object_unref (root);
+    }
+    else
+    {
+      DBG ("Not checking A:\\");
+    }
+  }
+
+  g_list_foreach (mounts, (GFunc) g_object_unref, NULL);
+  g_list_free (mounts);
+  g_object_unref (volmon);
+#else
+  cfg = gchd_get_grub_file_from_root (gchd, "/", file, error);
+#endif
+
+  return cfg;
 }
 
 

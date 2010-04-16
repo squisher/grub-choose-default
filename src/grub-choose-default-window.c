@@ -22,6 +22,7 @@
 #include "grub-choose-default-button-box.h"
 #include "grub-choose-default-util.h"
 #include "gchd-error.h"
+#include "gchd-util.h"
 
 /*- private prototypes -*/
 
@@ -161,7 +162,7 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   if (req.height > 800)
     req.height = 800;
 
-  g_debug ("Will request size %d by %d", req.width, req.height);
+  DBG ("Will request size %d by %d", req.width, req.height);
 
   gtk_window_set_default_size (GTK_WINDOW (self), req.width, req.height);
 }
@@ -186,7 +187,7 @@ tryandrun (GrubChooseDefaultWindow *win, const gchar * directory, const gchar * 
 
   path = g_build_filename (directory, script, NULL);
 
-  g_debug ("Looking for reboot script %s\n", path);
+  g_print ("Looking for reboot script %s\n", path);
 
   if (g_file_test (path, G_FILE_TEST_IS_EXECUTABLE))
   {

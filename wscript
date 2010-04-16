@@ -24,6 +24,9 @@ def configure (ctx):
   ctx.check_tool ('gcc')
   ctx.check_cfg (package='gtk+-2.0', args='--cflags --libs', uselib_store='GTK', mandatory=True)
 
+  if Options.platform == 'win32':
+    ctx.check_cfg (package='gio-2.0', args='--cflags --libs', uselib_store='GIO', mandatory=True)
+
   ctx.check (header_name='string.h', define_name='HAVE_STRING_H')
   ctx.check (header_name='sys/stat.h', define_name='HAVE_SYS_STAT_H')
   ctx.check (header_name='sys/types.h', define_name='HAVE_SYS_TYPES_H')

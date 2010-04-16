@@ -23,6 +23,7 @@
 
 #include "grub-choose-default-button-box.h"
 #include "gchd.h"
+#include "gchd-util.h"
 #include "grub-choose-default-widget.h"
 #include "grub-choose-default-util.h"
 
@@ -233,7 +234,7 @@ button_clicked (GtkButton *button, gpointer user_data)
 
   priv->def_entry = g_strdup (label);
 
-  g_debug ("Pressed %s", label);
+  DBG ("Pressed %s", label);
 
   if (priv->autocommit)
   {
