@@ -18,12 +18,21 @@
 
 #include "grub-choose-default-window.h"
 
+void
+no_output_handler (const gchar * str)
+{
+}
+
 int
 main (int argc, char **argv)
 {
   GrubChooseDefaultWindow * win;
 
   gtk_init (&argc, &argv);
+
+#ifdef G_OS_WIN32
+  g_set_print_handler (no_output_handler);
+#endif
 
   win = grub_choose_default_window_new ();
 

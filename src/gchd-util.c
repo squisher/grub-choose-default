@@ -27,7 +27,7 @@
 void
 gchd_debug_print (char * file, int line, char * fmt, ...)
 {
-#ifdef DEBUG
+#if DEBUG>0
   va_list args;
   gchar * fullfmt;
 
