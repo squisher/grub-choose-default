@@ -4,7 +4,10 @@
 import Options
 
 top = '.'
-out = '_build_'
+if Options.platform == 'win32':
+  out = '_build.win32_'
+else:
+  out = '_build_'
 
 APPNAME = 'grub-choose-default'
 VERSION = '0.6'

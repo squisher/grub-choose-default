@@ -51,10 +51,10 @@ SetCompressor lzma
 !include MUI2.nsh
 
 # Installer
-#!define MUI_ICON "grub-choose-default.ico"
+!define MUI_ICON "grub-choose-default.ico"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT
-#!define MUI_HEADERIMAGE_BITMAP "installer-top.bmp"
+!define MUI_HEADERIMAGE_BITMAP "grub-choose-default-logo.bmp"
 #!define MUI_WELCOMEFINISHPAGE_BITMAP "installer-side.bmp"
 !define MUI_COMPONENTSPAGE_SMALLDESC
 !define MUI_FINISHPAGE_NOAUTOCLOSE
@@ -62,7 +62,7 @@ SetCompressor lzma
 
 # Uninstaller
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-#!define MUI_HEADERIMAGE_UNBITMAP "installer-top.bmp"
+!define MUI_HEADERIMAGE_UNBITMAP "grub-choose-default-logo.bmp"
 #!define MUI_WELCOMEFINISHPAGE_UNBITMAP "installer-side.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
@@ -118,7 +118,7 @@ FunctionEnd
 BrandingText "grub-choose-default Windows Installer v${GCHD_INSTALLER_VERSION}"
 
 Name "${PROGRAM_NAME} ${PROGRAM_VERSION}"
-OutFile "..\_build_\grub-choose-default-${PROGRAM_VERSION}-win32-setup.exe"
+OutFile "..\_build.win32_\grub-choose-default-${PROGRAM_VERSION}-win32-setup.exe"
 
 InstallDir "$PROGRAMFILES\grub-choose-default"
 
@@ -130,13 +130,14 @@ Section "grub-choose-default" Section1
   SectionIn RO
 
   # Clean up previous confusion between grub-choose-default.ico and grub-choose-default.ico (seems to matter on Vista registry settings?)
-  #Delete "$INSTDIR\grub-choose-default.ico"
+  Delete "$INSTDIR\grub-choose-default.ico"
 
   SetOverwrite ifnewer
   SetOutPath $INSTDIR
   File "..\GPL-2"
-  File "..\_build_\default\src\grub-choose-default.exe"
-  File "..\_build_\default\src\gchd-test.exe"
+  File "..\_build.win32_\default\src\grub-choose-default.exe"
+  File "..\_build.win32_\default\src\gchd-test.exe"
+  File "grub-choose-default.ico"
 
   SetOutPath $APPDATA\grub-choose-default
   File /oname=reboot.vbs "..\reboot\windows.vbs"
@@ -160,7 +161,7 @@ Section -StartMenu_Desktop_Links
   WriteIniStr "$INSTDIR\homepage.url" "InternetShortcut" "URL" "${PROGRAM_WEB_SITE}"
 
   CreateDirectory "$SMPROGRAMS\grub-choose-default"
-  #CreateShortCut "$SMPROGRAMS\grub-choose-default\grub-choose-default.lnk" "$INSTDIR\grub-choose-default.exe" "" "$INSTDIR\grub-choose-default.ico"
+  CreateShortCut "$SMPROGRAMS\grub-choose-default\grub-choose-default.lnk" "$INSTDIR\grub-choose-default.exe" "" "$INSTDIR\grub-choose-default.ico"
   CreateShortCut "$SMPROGRAMS\grub-choose-default\grub-choose-default.lnk" "$INSTDIR\grub-choose-default.exe" "" ""
   CreateShortCut "$SMPROGRAMS\grub-choose-default\Project homepage.lnk" "$INSTDIR\Homepage.url"
   CreateShortCut "$SMPROGRAMS\grub-choose-default\Uninstall grub-choose-default.lnk" "$INSTDIR\grub-choose-default-uninst.exe"
@@ -218,7 +219,7 @@ Section Uninstall
   Delete "$INSTDIR\grub-choose-default.exe"
   Delete "$INSTDIR\gchd-test.exe"
   Delete "$INSTDIR\Homepage.url"
-  #Delete "$INSTDIR\grub-choose-default.ico"
+  Delete "$INSTDIR\grub-choose-default.ico"
 
   Delete "$SMPROGRAMS\grub-choose-default\grub-choose-default.lnk"
   Delete "$SMPROGRAMS\grub-choose-default\Uninstall grub-choose-default.lnk"
