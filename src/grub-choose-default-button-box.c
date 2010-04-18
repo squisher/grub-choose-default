@@ -41,6 +41,7 @@ enum {
   PROP_0,
   PROP_DEFAULT_ENTRY,
   PROP_AUTO_COMMIT,
+  PROP_GCHD,
 };
 
 enum {
@@ -81,6 +82,9 @@ grub_choose_default_button_box_get_property (GObject *object, guint property_id,
     break;
   case PROP_AUTO_COMMIT:
     g_value_set_boolean (value, priv->autocommit);
+    break;
+  case PROP_GCHD:
+    g_value_set_pointer (value, priv->gchd);
     break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -130,6 +134,8 @@ grub_choose_default_button_box_class_init (GrubChooseDefaultButtonBoxClass *klas
   g_object_class_override_property (object_class, PROP_DEFAULT_ENTRY, "default-entry");
   g_object_class_override_property (object_class, PROP_AUTO_COMMIT, "auto-commit");
 
+  g_object_class_install_property (object_class, PROP_GCHD,
+           g_param_spec_pointer ("gchd", "gchd", "gchd", G_PARAM_READABLE));
 }
 
 static void

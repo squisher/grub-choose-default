@@ -29,6 +29,9 @@
 #include "grub-choose-default-util.h"
 #include "gchd-error.h"
 #include "gchd-util.h"
+#include "gchd.h"
+
+#define MAIN_GROUP "Settings"
 
 /*- private prototypes -*/
 
@@ -38,6 +41,8 @@ static gboolean tryandrun (GrubChooseDefaultWindow *win, const gchar * directory
 static void handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer data);
 static void handle_cancel (GtkButton *button, gpointer data);
 static void handle_reboot (GtkToggleButton *button, gpointer data);
+static void load_settings (GrubChooseDefaultWindow *win);
+static void save_settings (GrubChooseDefaultWindow *win);
 
 
 /*- globals -*/
@@ -62,7 +67,9 @@ typedef struct _GrubChooseDefaultWindowPrivate GrubChooseDefaultWindowPrivate;
 struct _GrubChooseDefaultWindowPrivate {
   GrubChooseDefaultWidget * box;
   gboolean reboot;
-  GtkWidget *check_reboot;
+  GtkWidget * check_reboot;
+  GKeyFile * config;
+  gchar * config_fn;
 };
 
 static void
@@ -99,6 +106,12 @@ grub_choose_default_window_set_property (GObject *object, guint property_id,
 static void
 grub_choose_default_window_finalize (GObject *object)
 {
+  GrubChooseDefaultWindow *win = GRUB_CHOOSE_DEFAULT_WINDOW (object);
+  GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (win);
+
+  g_key_file_free (priv->config);
+  g_free (priv->config_fn);
+
   G_OBJECT_CLASS (grub_choose_default_window_parent_class)->finalize (object);
 }
 
@@ -144,7 +157,7 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 
   area = gtk_dialog_get_action_area (GTK_DIALOG (self));
 
-  priv->check_reboot = check_reboot = gtk_check_button_new_with_label ("Logout / Reboot immediately");
+  priv->check_reboot = check_reboot = gtk_check_button_new_with_label ("End session immediately");
   update_reboot (self);
   g_signal_connect (check_reboot, "toggled", G_CALLBACK (handle_reboot), self);
 
@@ -171,6 +184,11 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   DBG ("Will request size %d by %d", req.width, req.height);
 
   gtk_window_set_default_size (GTK_WINDOW (self), req.width, req.height);
+
+  priv->config_fn = g_build_filename (g_get_user_config_dir (), "grub-choose-default", "config", NULL);
+  priv->config = g_key_file_new ();
+
+  load_settings (self);
 }
 
 
@@ -312,6 +330,8 @@ handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer dat
   GrubChooseDefaultWindow *win = GRUB_CHOOSE_DEFAULT_WINDOW (data);
   GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (win);
 
+  save_settings (win);
+
   if (priv->reboot)
   {
     perform_reboot (win);
@@ -325,6 +345,8 @@ handle_cancel (GtkButton *button, gpointer data)
 {
   GrubChooseDefaultWindow *win = GRUB_CHOOSE_DEFAULT_WINDOW (data);
 
+  save_settings (win);
+
   gtk_dialog_response (GTK_DIALOG (win), GTK_RESPONSE_CANCEL);
 }
 
@@ -336,6 +358,99 @@ handle_reboot (GtkToggleButton *button, gpointer data)
 
   priv->reboot = !priv->reboot;
 }
+
+static void
+load_settings (GrubChooseDefaultWindow *win)
+{
+  GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (win);
+  GError * error = NULL;
+  gboolean r;
+  gboolean reboot;
+  gchar * grub_dir;
+
+
+  if (!g_file_test (priv->config_fn, G_FILE_TEST_EXISTS))
+    return;
+
+  DBG ("Loading settings...");
+
+  r = g_key_file_load_from_file (priv->config, priv->config_fn, G_KEY_FILE_KEEP_COMMENTS, &error);
+
+  if (!r)
+  {
+    grub_choose_default_error (GTK_WIDGET (win), error);
+    return;
+  }
+
+  reboot = g_key_file_get_boolean (priv->config, MAIN_GROUP, "reboot", &error);
+
+  if (error)
+  {
+    grub_choose_default_error (GTK_WIDGET (win), error);
+    g_error_free (error);
+  }
+  else
+  {
+    g_object_set (win, "reboot", reboot, NULL);
+  }
+
+  grub_dir = g_key_file_get_string (priv->config, MAIN_GROUP, "grub_dir", &error);
+
+  if (error)
+  {
+    grub_choose_default_error (GTK_WIDGET (win), error);
+    g_error_free (error);
+  }
+  else
+  {
+    Gchd * gchd;
+
+    g_object_get (priv->box, "gchd", &gchd, NULL);
+
+    gchd_set_grub_dir (gchd, grub_dir);
+    g_free (grub_dir);
+  }
+}
+
+static void
+save_settings (GrubChooseDefaultWindow *win)
+{
+  GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (win);
+  GError * error = NULL;
+  gboolean r;
+  gchar * data;
+  Gchd * gchd;
+  gsize len;
+
+  DBG ("Saving settings...");
+
+  g_key_file_set_boolean (priv->config, MAIN_GROUP, "reboot", priv->reboot);
+
+  /*
+   * Don't save this, it's a user setting 
+  g_object_get (priv->box, "gchd", &gchd, NULL);
+  g_key_file_set_string (priv->config, MAIN_GROUP, "grub_dir", gchd_get_grub_dir (gchd));
+  */
+  
+  data = g_key_file_to_data (priv->config, &len, &error);
+
+  if (!data)
+  {
+    grub_choose_default_error (GTK_WIDGET (win), error);
+    g_error_free (error);
+    return;
+  }
+
+  r = g_file_set_contents (priv->config_fn, data, len, &error);
+
+  if (!r)
+  {
+    grub_choose_default_error (GTK_WIDGET (win), error);
+    g_error_free (error);
+    return;
+  }
+}
+
 
 /*******************/
 /*- public methods-*/

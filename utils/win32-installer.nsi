@@ -38,7 +38,7 @@ SetCompressor lzma
 
 # grub-choose-default program information
 !define PROGRAM_NAME "grub-choose-default"
-!define PROGRAM_VERSION "0.7"
+!define PROGRAM_VERSION "0.6"
 !define PROGRAM_WEB_SITE "http://ds.mcbf.net/wiki/GrubChooseDefault"
 
 # Installer for GTK+ 2.12 runtime; will be downloaded from grub-choose-default-torrent.org
@@ -54,16 +54,16 @@ SetCompressor lzma
 #!define MUI_ICON "grub-choose-default.ico"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT
-!define MUI_HEADERIMAGE_BITMAP "installer-top.bmp"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "installer-side.bmp"
+#!define MUI_HEADERIMAGE_BITMAP "installer-top.bmp"
+#!define MUI_WELCOMEFINISHPAGE_BITMAP "installer-side.bmp"
 !define MUI_COMPONENTSPAGE_SMALLDESC
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_ABORTWARNING
 
 # Uninstaller
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-!define MUI_HEADERIMAGE_UNBITMAP "installer-top.bmp"
-!define MUI_WELCOMEFINISHPAGE_UNBITMAP "installer-side.bmp"
+#!define MUI_HEADERIMAGE_UNBITMAP "installer-top.bmp"
+#!define MUI_WELCOMEFINISHPAGE_UNBITMAP "installer-side.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 # --- Start of Modern User Interface ---
@@ -118,7 +118,7 @@ FunctionEnd
 BrandingText "grub-choose-default Windows Installer v${GCHD_INSTALLER_VERSION}"
 
 Name "${PROGRAM_NAME} ${PROGRAM_VERSION}"
-OutFile "..\_build_\win32\grub-choose-default-${PROGRAM_VERSION}-win32-setup.exe"
+OutFile "..\_build_\grub-choose-default-${PROGRAM_VERSION}-win32-setup.exe"
 
 InstallDir "$PROGRAMFILES\grub-choose-default"
 
@@ -137,6 +137,9 @@ Section "grub-choose-default" Section1
   File "..\GPL-2"
   File "..\_build_\default\src\grub-choose-default.exe"
   File "..\_build_\default\src\gchd-test.exe"
+
+  SetOutPath $APPDATA\grub-choose-default
+  File /oname=reboot.vbs "..\reboot\windows.vbs"
 
   # Create grub-choose-default.cmd file
 #  fileOpen $0 "$INSTDIR\grub-choose-default.cmd" w
@@ -171,7 +174,7 @@ Section -Uninstaller
 SectionEnd
 
 # Install GTK+ 2.16
-Section "GTK+ 2.16 runtime" Section4
+Section "GTK+ 2.16 runtime" Section2
   GTK_install_start:
   MessageBox MB_OK "You will now download and run the installer for the GTK+ 2.16 runtime. \
     You must be connected to the internet before you press the OK button. \
@@ -181,7 +184,7 @@ Section "GTK+ 2.16 runtime" Section4
     You must use the GTK+ 2.16 uninstaller if you want to remove it together with grub-choose-default."
 
   # Download GTK+ installer to TEMP dir
-  NSISdl::download http://download.grub-choose-default-torrent.org/windows/deps/${GCHD_GTK_DEPENDENCY} "$TEMP\${GCHD_GTK_DEPENDENCY}"
+  NSISdl::download http://dsp.mcbf.net/grub-choose-default/${GCHD_GTK_DEPENDENCY} "$TEMP\${GCHD_GTK_DEPENDENCY}"
 
   # Get return value (success, cancel, or string describing the network error)
   Pop $2

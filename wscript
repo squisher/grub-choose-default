@@ -7,7 +7,7 @@ top = '.'
 out = '_build_'
 
 APPNAME = 'grub-choose-default'
-VERSION = '0.7'
+VERSION = '0.6'
 
 def set_options (opt):
   opt.add_option ('--debug', action='store_true', default=False, help='Enable debugging code', dest='debug')

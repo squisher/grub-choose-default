@@ -202,6 +202,18 @@ gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
   return cfg;
 }
 
+void
+gchd_set_grub_dir (Gchd * gchd, gchar * grub_dir)
+{
+  g_free (gchd->grub_dir);
+  gchd->grub_dir = g_strdup (grub_dir);
+}
+
+const gchar *
+gchd_get_grub_dir (Gchd * gchd)
+{
+  return gchd->grub_dir;
+}
 
 /* interface functions */
 
