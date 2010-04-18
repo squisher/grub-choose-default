@@ -22,6 +22,8 @@
 #  include <string.h>
 #endif
 
+#include <glib/gstdio.h>
+
 #include "gchd-direct.h"
 #include "grub-envblk.h"
 #include "gchd-error.h"

@@ -51,7 +51,7 @@ typedef struct {
 
 GType grub_choose_default_button_box_get_type (void);
 
-GrubChooseDefaultButtonBox* grub_choose_default_button_box_new (void);
+GrubChooseDefaultButtonBox* grub_choose_default_button_box_new (gchar * grub_dir);
 
 G_END_DECLS
 

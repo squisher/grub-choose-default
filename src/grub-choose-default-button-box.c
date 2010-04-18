@@ -30,6 +30,7 @@
 /*- private prototypes -*/
 
 static void grub_choose_default_widget_interface_init (GrubChooseDefaultWidgetInterface *iface);
+static GObject * grub_choose_default_button_box_constructor (GType type, guint n_properties, GObjectConstructParam * properties);
 
 static gboolean commit (GrubChooseDefaultWidget * widget, GError **error);
 
@@ -42,12 +43,14 @@ enum {
   PROP_DEFAULT_ENTRY,
   PROP_AUTO_COMMIT,
   PROP_GCHD,
+  PROP_GRUB_DIR,
 };
 
 enum {
   LAST_SIGNAL,
 }; 
 
+static GObjectClass * parent_class = NULL;
 
 /*****************/
 /*- class setup -*/
@@ -86,6 +89,9 @@ grub_choose_default_button_box_get_property (GObject *object, guint property_id,
   case PROP_GCHD:
     g_value_set_pointer (value, priv->gchd);
     break;
+  case PROP_GRUB_DIR:
+    g_value_set_string (value, gchd_get_grub_dir (priv->gchd));
+    break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
   }
@@ -103,6 +109,10 @@ grub_choose_default_button_box_set_property (GObject *object, guint property_id,
     break;
   case PROP_AUTO_COMMIT:
     priv->autocommit = g_value_get_boolean (value);
+    break;
+  case PROP_GRUB_DIR:
+    gchd_set_grub_dir (priv->gchd, g_value_get_string (value));
+    DBG ("Set grub dir to %s", gchd_get_grub_dir (priv->gchd));
     break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -127,15 +137,20 @@ grub_choose_default_button_box_class_init (GrubChooseDefaultButtonBoxClass *klas
 
   g_type_class_add_private (klass, sizeof (GrubChooseDefaultButtonBoxPrivate));
 
+  parent_class = g_type_class_peek_parent (klass);
+
   object_class->get_property = grub_choose_default_button_box_get_property;
   object_class->set_property = grub_choose_default_button_box_set_property;
   object_class->finalize = grub_choose_default_button_box_finalize;
+  object_class->constructor = grub_choose_default_button_box_constructor;
 
   g_object_class_override_property (object_class, PROP_DEFAULT_ENTRY, "default-entry");
   g_object_class_override_property (object_class, PROP_AUTO_COMMIT, "auto-commit");
 
   g_object_class_install_property (object_class, PROP_GCHD,
            g_param_spec_pointer ("gchd", "gchd", "gchd", G_PARAM_READABLE));
+  g_object_class_install_property (object_class, PROP_GRUB_DIR,
+           g_param_spec_string ("grub-dir", "Grub directory", "Grub directory", NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 }
 
 static void
@@ -148,13 +163,24 @@ static void
 grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
 {
   GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_BUTTON_BOX (self));
+
+  priv->gchd = gchd_new ();
+}
+
+static GObject *
+grub_choose_default_button_box_constructor (GType type, guint n_properties, GObjectConstructParam * properties)
+{
+  GrubChooseDefaultButtonBoxPrivate *priv;
+  GObject * self;
+
   GError *error = NULL;
   int i;
   GList *entries;
   gint n_entries;
   gchar * def_entry;
 
-  priv->gchd = gchd_new ();
+  self = G_OBJECT_CLASS (parent_class)->constructor (type, n_properties, properties);
+  priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_BUTTON_BOX (self));
 
   n_entries = gchd_get_menu_entries (priv->gchd, &entries, &error);
 
@@ -163,7 +189,7 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
     grub_choose_default_error (NULL, error);
     g_error_free (error);
 
-    return;
+    return self;
   }
 
   def_entry = gchd_get_default_entry (priv->gchd, &error);
@@ -173,7 +199,7 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
     grub_choose_default_error (NULL, error);
     g_error_free (error);
 
-    return;
+    return self;
   }
 
   priv->buttons = g_new (GtkWidget *, n_entries);
@@ -218,6 +244,8 @@ grub_choose_default_button_box_init (GrubChooseDefaultButtonBox *self)
       
     gtk_widget_show (button);
   }
+
+  return self;
 }
 
 
@@ -282,7 +310,7 @@ commit (GrubChooseDefaultWidget * widget, GError **report_error)
 /*******************/
 
 GrubChooseDefaultButtonBox*
-grub_choose_default_button_box_new (void)
+grub_choose_default_button_box_new (gchar * grub_dir)
 {
-  return g_object_new (GRUB_CHOOSE_DEFAULT_TYPE_BUTTON_BOX, NULL);
+  return g_object_new (GRUB_CHOOSE_DEFAULT_TYPE_BUTTON_BOX, "grub-dir", grub_dir, NULL);
 }

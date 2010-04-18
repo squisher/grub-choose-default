@@ -23,6 +23,8 @@
 #  include <string.h>
 #endif
 
+#include <glib/gstdio.h>
+
 #include "grub-choose-default-window.h"
 #include "grub-choose-default-widget.h"
 #include "grub-choose-default-button-box.h"
@@ -70,6 +72,7 @@ struct _GrubChooseDefaultWindowPrivate {
   GtkWidget * check_reboot;
   GKeyFile * config;
   gchar * config_fn;
+  gchar * grub_dir;
 };
 
 static void
@@ -96,6 +99,7 @@ grub_choose_default_window_set_property (GObject *object, guint property_id,
   switch (property_id) {
     case PROP_REBOOT:
       priv->reboot = g_value_get_boolean (value);
+      DBG ("Setting reboot to %d", priv->reboot);
       update_reboot (GRUB_CHOOSE_DEFAULT_WINDOW (object));
       break;
   default:
@@ -128,7 +132,7 @@ grub_choose_default_window_class_init (GrubChooseDefaultWindowClass *klass)
 
   g_object_class_install_property (object_class, PROP_REBOOT,
            g_param_spec_boolean ("reboot", "reboot", "reboot",
-                                 FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+                                 FALSE, G_PARAM_READWRITE));
 }
 
 static void
@@ -140,6 +144,11 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   GtkWidget *check_reboot;
   GtkWidget *button_cancel;
 
+  priv->config_fn = g_build_filename (g_get_user_config_dir (), "grub-choose-default", "config", NULL);
+  priv->config = g_key_file_new ();
+
+  load_settings (self);
+
   area = gtk_dialog_get_content_area (GTK_DIALOG (self));
 
   scrolled = gtk_scrolled_window_new (NULL, NULL);
@@ -147,7 +156,7 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_widget_show (scrolled);
 
-  priv->box = GRUB_CHOOSE_DEFAULT_WIDGET (grub_choose_default_button_box_new ());
+  priv->box = GRUB_CHOOSE_DEFAULT_WIDGET (grub_choose_default_button_box_new (priv->grub_dir));
   g_signal_connect (priv->box, "selected", G_CALLBACK (handle_selected), self);
   g_object_set (priv->box, "auto-commit", TRUE, NULL);
 
@@ -184,11 +193,6 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   DBG ("Will request size %d by %d", req.width, req.height);
 
   gtk_window_set_default_size (GTK_WINDOW (self), req.width, req.height);
-
-  priv->config_fn = g_build_filename (g_get_user_config_dir (), "grub-choose-default", "config", NULL);
-  priv->config = g_key_file_new ();
-
-  load_settings (self);
 }
 
 
@@ -201,7 +205,8 @@ update_reboot (GrubChooseDefaultWindow *win)
 {
   GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (win);
 
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->check_reboot), priv->reboot);
+  if (priv->check_reboot)
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->check_reboot), priv->reboot);
 }
 
 static gboolean
@@ -366,7 +371,6 @@ load_settings (GrubChooseDefaultWindow *win)
   GError * error = NULL;
   gboolean r;
   gboolean reboot;
-  gchar * grub_dir;
 
 
   if (!g_file_test (priv->config_fn, G_FILE_TEST_EXISTS))
@@ -394,21 +398,13 @@ load_settings (GrubChooseDefaultWindow *win)
     g_object_set (win, "reboot", reboot, NULL);
   }
 
-  grub_dir = g_key_file_get_string (priv->config, MAIN_GROUP, "grub_dir", &error);
+  if (g_key_file_has_key (priv->config, MAIN_GROUP, "grub_dir", &error))
+    priv->grub_dir = g_key_file_get_string (priv->config, MAIN_GROUP, "grub_dir", &error);
 
   if (error)
   {
     grub_choose_default_error (GTK_WIDGET (win), error);
     g_error_free (error);
-  }
-  else
-  {
-    Gchd * gchd;
-
-    g_object_get (priv->box, "gchd", &gchd, NULL);
-
-    gchd_set_grub_dir (gchd, grub_dir);
-    g_free (grub_dir);
   }
 }
 
@@ -419,7 +415,7 @@ save_settings (GrubChooseDefaultWindow *win)
   GError * error = NULL;
   gboolean r;
   gchar * data;
-  Gchd * gchd;
+  gchar * dir;
   gsize len;
 
   DBG ("Saving settings...");
@@ -440,6 +436,11 @@ save_settings (GrubChooseDefaultWindow *win)
     g_error_free (error);
     return;
   }
+
+  dir = g_path_get_dirname (priv->config_fn);
+  if (!g_file_test (priv->config_fn, G_FILE_TEST_EXISTS))
+    g_mkdir (dir, 0770);
+  g_free (dir);
 
   r = g_file_set_contents (priv->config_fn, data, len, &error);
 
