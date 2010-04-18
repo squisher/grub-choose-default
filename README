@@ -1,64 +1,61 @@
 /============================================================================\
-| grub-choose-default.py                                                     |
+| grub-choose-default                                                        |
 |                                                                            |
-| Copyright 2007-2008, David Mohr <david@mcbf.net>                           |
+| Copyright 2007-2010, David Mohr <david@mcbf.net>                           |
 |                                                                            |
-| Version 0.4, 2010-03-XX                                                    |
+| Version 0.6, 2010-04-18                                                    |
 |                                                                            |
 | Released under the GNU GPL v2 or higher                                    |
 | This is free software; see the source for copying conditions. There is NO  |
 | warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.|
-|                                                                            |
 \============================================================================/
 
 Homepage: http://ds.mcbf.net/wiki/GrubChooseDefault
 
-A simple python GUI program to set your grub default for the next reboot.
-It should run fine both under Linux and Windows. Note though that under Windows
-you need to get filesystem access to your /boot to modify the grub 
-configuration files. At the moment this seems to be only possible with an 
-ext2/3 partition (http://www.fs-driver.org/).
+A simple GUI program to set your grub default for the next reboot. This
+program only works with the "new" grub, i.e., version 1.98+.  If you are using
+grub-0.9x (grub-legacy), then please use the previous v0.3 release. 
+
+Grub-choose-default works both under Linux and Windows (see README.win32). It
+should run under other Unices as well, but has not been tested (user reports
+are welcome).
 
 What it does is:
-1. Check your configuration file to have the required 'default saved' setting
-2. Display your boot menu options, highlighting the current default
-3. After clicking on one of the buttons, the new default will be saved in
-   grub's 'default' file
-4. If reboot mode is enabled, and the appropriate support script is used,
-   you will be prompted to reboot
-
-It uses Tkinter, because that's included in every python installation.
+1. Display your boot menu options, highlighting the current default.
+2. After clicking on one of the buttons, the new default will be saved in
+   grub's environment.
+3. Optionally end your session.
 
 
 *****************************************************************************
-* Reboot
-******** 
+* Permissions:
+**************
 
-Because each root access is needed to change the grub default and/or 
-configuration, it is not possible to initiate the desktop reboot sequence from 
-within the script. Also each Linux desktop environment has its own way of 
-initiating a reboot, so the reboot is not handled by the script. Instead when a
-reboot should happen, grub-choose-default prints a message to standard output.
-A script can parse the output and search for 'reboot'. If the string is found,
-then it should initiate a reboot, otherwise it should not. Return codes can't
-be used here, because gksudo always exists with 0 when the authorization
-succeeded. 
-See some included scripts in the reboot/ subdirectory. If you use a way to
-reboot not included there, please send me the script and I'll add it in. Note
-that the button to reboot is not shown by default under Linux, instead,
-run grub-choose-default with '-r' if you want this functionality.
+Step 2 requires root permissions. Grub-choose-default will call:
+  $ sudo grub-set-default 'New Default'
+This requires an entry in sudoers with the NOPASSWD attribute. For example:
+"
+$user ALL=(root) NOPASSWD: /usr/sbin/grub-set-default
+"
+Where $user is your user name.
 
-Under Windows the reboot functionality is included, because there is only one
-way to shut down (actually, that's a lie: win9x & co. use a different method,
-but I won't include that until someone complains to me, as that's rare
-nowadays).
+Running grub-choose-default as root is not recommended.
 
 
 *****************************************************************************
+* Session Logout:
+*****************
 
-This version only works with grub2 (grub-pc). If you are using grub-0.9x
-(grub-legacy), then please use the v0.3 release.
+Logging out is dependent on your desktop environment. Example scripts are
+included in the reboot/ subdirectory. To use this functionality, you have to
+copy the script you want to use to $XDG_CONFIG_DIR/grub-choose-default/reboot .
+$XDG_CONFIG_DIR usually is ~/.config .
 
+If anyone can come up with a script that autodetects the DE and calls the
+appropriate logout command, please send me a copy and I will include it.
+
+
+*****************************************************************************
 
 Please email me with any questions, comments or if you should find a bug at 
 david@mcbf.net.

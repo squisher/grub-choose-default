@@ -50,6 +50,8 @@ SetCompressor lzma
 # Modern User Interface 2
 !include MUI2.nsh
 
+!include "MUI_EXTRAPAGES.nsh"
+
 # Installer
 !define MUI_ICON "grub-choose-default.ico"
 !define MUI_HEADERIMAGE
@@ -73,6 +75,9 @@ SetCompressor lzma
 
 # License page
 !insertmacro MUI_PAGE_LICENSE "..\GPL-2"
+
+# README page
+!insertmacro MUI_PAGE_README "../README.win32"
 
 # Components page
 !insertmacro MUI_PAGE_COMPONENTS
@@ -140,7 +145,9 @@ Section "grub-choose-default" Section1
   File "grub-choose-default.ico"
 
   SetOutPath $APPDATA\grub-choose-default
+  SetOverwrite off
   File /oname=reboot.vbs "..\reboot\windows.vbs"
+  SetOverwrite lastused
 
   # Create grub-choose-default.cmd file
 #  fileOpen $0 "$INSTDIR\grub-choose-default.cmd" w
@@ -162,7 +169,6 @@ Section -StartMenu_Desktop_Links
 
   CreateDirectory "$SMPROGRAMS\grub-choose-default"
   CreateShortCut "$SMPROGRAMS\grub-choose-default\grub-choose-default.lnk" "$INSTDIR\grub-choose-default.exe" "" "$INSTDIR\grub-choose-default.ico"
-  CreateShortCut "$SMPROGRAMS\grub-choose-default\grub-choose-default.lnk" "$INSTDIR\grub-choose-default.exe" "" ""
   CreateShortCut "$SMPROGRAMS\grub-choose-default\Project homepage.lnk" "$INSTDIR\Homepage.url"
   CreateShortCut "$SMPROGRAMS\grub-choose-default\Uninstall grub-choose-default.lnk" "$INSTDIR\grub-choose-default-uninst.exe"
 SectionEnd
@@ -204,6 +210,13 @@ SectionEnd
 LangString DESC_Section1 ${LANG_ENGLISH} "Install grub-choose-default"
 LangString DESC_Section2 ${LANG_ENGLISH} "Download and install the GTK+ 2.16 runtime. \
   This is skipped automatically if GTK+ is already installed."
+
+# Fields are: Title, subtitle, above text area, below text area
+${ReadmeLanguage} "${LANG_ENGLISH}" \
+    "Read Me" \
+    "Please read the following important information." \
+    "" \
+    ""
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${Section1} $(DESC_Section1)

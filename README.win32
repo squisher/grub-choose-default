@@ -1,0 +1,21 @@
+The grub configuration is stored in your Linux file system, usually under
+/boot. Grub-choose-default for Windows needs access to the grub/ subdirectory
+of that folder.
+
+If you have your root or boot directory on an ext2/3 partition, then you can
+easily make it available under Windows using the ext2 Windows FS driver from 
+  http://www.fs-driver.org/
+Once this directory is available under Windows, grub-choose-default should
+automatically find it by probing all available Windows drive letters.
+
+It searches for a "boot\grub" or just "grub" directory. If you do not want
+grub-choose-default to search for the folder, or you want to improve the program
+start-up time, you can set the hidden option 'grub_dir' in the configuration
+file. 
+
+The backslash, "\", must be quoted, e.g., 
+  grub_dir=D:\\grub
+The configuration file is located in the "Application Data\grub-choose-default"
+folder inside your profile (usually "C:\Documents and Settings"). The default
+configuration is created after the the first program run. Add the grub_dir
+line to the end of the file.

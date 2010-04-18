@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd "`dirname $0`"
+
 if [ ! -x "`which inkscape`" ]; then
   echo "Could not find inkscape"
   exit 1
@@ -27,8 +29,9 @@ echo
 echo "Creating Windows icon"
 convert $bitmaps ../win32/grub-choose-default.ico
 
-echo
-echo "Creating installer logo"
-logo=grub-choose-default-logo
-inkscape -z -f scalable/grub-choose-default.svg -e $logo.png -w 64 -h 64
-convert $logo.png ../win32/$logo.bmp && rm $logo.png
+# Convert sucks with bmp, plus fine tuning is needed. 
+# echo
+# echo "Creating installer logo"
+# logo=grub-choose-default-logo
+# inkscape -z -f scalable/grub-choose-default.svg -e $logo.png -w 64 -h 64
+# convert $logo.png ../win32/$logo.bmp && rm $logo.png
