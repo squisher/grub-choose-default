@@ -23,8 +23,15 @@ no_output_handler (const gchar * str)
 {
 }
 
+/*
+#ifdef G_OS_WIN32
+int
+WinMain (int argc, char **argv)
+#else
+*/
 int
 main (int argc, char **argv)
+//#endif
 {
   GrubChooseDefaultWindow * win;
 

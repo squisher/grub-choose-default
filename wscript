@@ -51,8 +51,10 @@ def configure (ctx):
     else:
       manpage = 'no'
 
+  #print ctx.env
   if Options.platform == 'win32':
     ctx.check_cfg (package='gio-2.0', args='--cflags --libs', uselib_store='GIO', mandatory=True)
+    ctx.env.append_value ('LINKFLAGS', '-mwindows'.split ())
 
   ctx.check (header_name='string.h', define_name='HAVE_STRING_H')
   ctx.check (header_name='sys/stat.h', define_name='HAVE_SYS_STAT_H')
