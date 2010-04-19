@@ -321,7 +321,7 @@ perform_reboot (GrubChooseDefaultWindow *win)
 
   g_set_error (&error,
                GCHD_ERROR, GCHD_ERROR_NO_REBOOT_SCRIPT,
-               "Could not find any reboot scripts.\nYou can install one in %s/%s.",
+               "Could not find any reboot scripts.\nYou can install one in %s/%s .",
                config_dir, script);
   grub_choose_default_error (GTK_WIDGET (win), error);
   g_error_free (error);

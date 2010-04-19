@@ -20,7 +20,7 @@ manpage.1: manpage.sgml
   <!ENTITY dhfirstname "<firstname>Kjell</firstname>">
   <!ENTITY dhsurname   "<surname>Braden</surname>">
   <!-- Please adjust the date whenever revising the manpage. -->
-  <!ENTITY dhdate      "<date>2008-05-29</date>">
+  <!ENTITY dhdate      "<date>2010-04-18</date>">
   <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
        allowed: see man(7), man(1). -->
   <!ENTITY dhsection   "<manvolnum>8</manvolnum>">
@@ -44,7 +44,7 @@ manpage.1: manpage.sgml
       &dhsurname;
     </author>
     <copyright>
-      <year>2007</year>
+      <year>2010</year>
       <holder>&dhusername;</holder>
     </copyright>
     &dhdate;
@@ -63,7 +63,6 @@ manpage.1: manpage.sgml
     <cmdsynopsis>
       <command>&dhpackage;</command>
 
-    <arg><option>-r</option></arg>
     </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1>
@@ -71,34 +70,52 @@ manpage.1: manpage.sgml
 
     <para><command>&dhpackage;</command> is a small GUI program which displays
     your grub entries in a menu and lets you quickly change the default
-    without having to go to the command line as well as looking up the index
-    of the new default.</para>
+    without having to go to the command line.</para>
 
     <para>Additionally <command>&dhpackage;</command> works also under the
-    certain other operating system which resembles an opening in the wall,
-    since it is written in Python. Other OSes have not been tested.</para>
+    certain other operating system which resembles an opening in the wall.
+    Other OSes have not been tested, but Unix-like ones are expected to work.</para>
 
-    <para>At this point in time it only works for legacy grub (0.xx).</para>
+    <para>This version only works for the new grub (1.98 or newer).</para>
 
   </refsect1>
+
   <refsect1>
     <title>OPTIONS</title>
 
     <variablelist>
       <varlistentry>
-        <term><option>-r</option>
+        <term><option>--help</option>
         </term>
         <listitem>
-          <para>If used, <command>&dhpackage;</command> will show the reboot
-          option, which is disabled by default.</para>
-          <para>Note that this only controls the display of the reboot button,
-          the actual reboot logic is outside of the scope of this program.
-          Please check the included support scripts, which provide the
-          functionality for some desktop environments.</para>
+          <para>This option lists the default gtk command line
+          parameters.</para>
         </listitem>
       </varlistentry>
     </variablelist>
   </refsect1>
+
+  <refsect1>
+    <title>PERMISSIONS</title>
+
+    <para>Setting the grub default requires root permissions.
+    <command>&dhpackage;</command> uses <command>sudo</command> to call
+    <command>grub-set-default</command>. This call is non-interactive; as a
+    result a NOPASSWD sudo configuration is required.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>SESSION SUPPORT</title>
+
+    <para><command>&dhpackage;</command> allows a script to be run to immediate
+    end the current session. Since ending the session is dependent on the desktop
+    environment, the user has to install the appropriate script as 
+    <filename>$XDG_CONFIG_DIR/grub-set-default/reboot</filename>. Examples scripts
+    can be found in the reboot directory of the source distribution.
+    </para>
+  </refsect1>
+
   <refsect1>
     <title>AUTHOR</title>
 

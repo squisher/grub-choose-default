@@ -1,0 +1,16 @@
+#! /usr/bin/env python
+# WAF build script for midori
+# This file is licensed under the terms of the expat license, see the file EXPAT.
+
+import Utils
+import os
+
+for size in [16, 22, 24, 32, 48, 'scalable']:
+  try:
+    s = int (size)
+    d = str(size) + 'x' + str(size)
+  except ValueError, e:
+    d = str(size)
+
+  bld.install_files ('${PREFIX}/usr/share/icons/hicolor/' + d + '/' + 'category',
+                     d + '/grub-choose-default.*')

@@ -1,7 +1,15 @@
 #!/usr/bin/env python
+#
+# Copyright 2010  David Mohr <david@mcbf.net>
+#
+# Licensed under the EXPAT license.
+#
+# In parts based on midori's wscript
 
 #from __future__ import print_function
+
 import Options
+import Utils
 
 top = '.'
 if Options.platform == 'win32':
@@ -11,6 +19,17 @@ else:
 
 APPNAME = 'grub-choose-default'
 VERSION = '0.6'
+IS_DEV=True
+
+
+if IS_DEV:
+  try:
+    git = Utils.cmd_output (['git', 'rev-parse', '--short', 'HEAD'], silent=True)
+    if git:
+      VERSION = (VERSION + '-' + git).strip ()
+  except:
+    pass
+
 
 def set_options (opt):
   opt.add_option ('--debug', action='store_true', default=False, help='Enable debugging code', dest='debug')
@@ -26,6 +45,11 @@ def configure (ctx):
 
   ctx.check_tool ('gcc')
   ctx.check_cfg (package='gtk+-2.0', args='--cflags --libs', uselib_store='GTK', mandatory=True)
+  if Options.platform != 'win32':
+    if ctx.find_program ('docbook-to-man', var='DOCBOOKTOMAN'):
+      manpage = 'yes'
+    else:
+      manpage = 'no'
 
   if Options.platform == 'win32':
     ctx.check_cfg (package='gio-2.0', args='--cflags --libs', uselib_store='GIO', mandatory=True)
@@ -49,11 +73,12 @@ def configure (ctx):
 def build (ctx):
   #ctx.recurse ('src')
   ctx.add_subdirs ('src')
+  ctx.add_subdirs ('icons')
 
-  if Options.platform != 'win32':
+  if Options.platform != 'win32' and ctx.env.DOCBOOKTOMAN:
     ctx(
-        rule = 'docbook-to-man ${SRC} > ${TGT}',
+        rule = ctx.env.DOCBOOKTOMAN + ' ${SRC} > ${TGT}',
         source = 'grub-choose-default.sgml',
         target = 'grub-choose-default.8',
-        install_path = '${MANDIR}/man8',
+        install_path = '${PREFIX}/usr/share/man/man8',
         )
