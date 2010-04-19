@@ -75,10 +75,12 @@ def build (ctx):
   ctx.add_subdirs ('src')
   ctx.add_subdirs ('icons')
 
-  if Options.platform != 'win32' and ctx.env.DOCBOOKTOMAN:
-    ctx(
-        rule = ctx.env.DOCBOOKTOMAN + ' ${SRC} > ${TGT}',
-        source = 'grub-choose-default.sgml',
-        target = 'grub-choose-default.8',
-        install_path = '${PREFIX}/usr/share/man/man8',
-        )
+  if Options.platform != 'win32':
+    if ctx.env.DOCBOOKTOMAN:
+      ctx(
+          rule = ctx.env.DOCBOOKTOMAN + ' ${SRC} > ${TGT}',
+          source = 'grub-choose-default.sgml',
+          target = 'grub-choose-default.8',
+          install_path = '${PREFIX}/usr/share/man/man8',
+          )
+    ctx.install_files ("${PREFIX}/usr/share/applications", "grub-choose-default.desktop");

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=grub-choose-default
+Comment=GUI to choose the grub default boot entry
+Categories=GTK;System
+Exec=grub-choose-default
+Icon=grub-choose-default
+Terminal=false
+StartupNotify=true
