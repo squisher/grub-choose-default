@@ -141,7 +141,7 @@ Section "grub-choose-default" Section1
   SetOutPath $INSTDIR
   File "..\GPL-2"
   File "..\_build.win32_\default\src\grub-choose-default.exe"
-  File "..\_build.win32_\default\src\gchd-test.exe"
+  #File "..\_build.win32_\default\src\gchd-test.exe"
   File "grub-choose-default.ico"
 
   SetOutPath $APPDATA\grub-choose-default
@@ -230,7 +230,7 @@ Section Uninstall
   Delete "$INSTDIR\grub-choose-default-uninst.exe"
   Delete "$INSTDIR\GPL-2"
   Delete "$INSTDIR\grub-choose-default.exe"
-  Delete "$INSTDIR\gchd-test.exe"
+  #Delete "$INSTDIR\gchd-test.exe"
   Delete "$INSTDIR\Homepage.url"
   Delete "$INSTDIR\grub-choose-default.ico"
 

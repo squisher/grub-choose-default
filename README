@@ -3,7 +3,7 @@
 |                                                                            |
 | Copyright 2007-2010, David Mohr <david@mcbf.net>                           |
 |                                                                            |
-| Version 0.6, 2010-04-18                                                    |
+| Version 0.6, 2010-04-19                                                    |
 |                                                                            |
 | Released under the GNU GPL v2 or higher                                    |
 | This is free software; see the source for copying conditions. There is NO  |
@@ -56,16 +56,26 @@ appropriate logout command, please send me a copy and I will include it.
 
 
 *****************************************************************************
-* To Do:
-********
+* To Do / Known limitations:
+****************************
 
- - Internationalization, if there is enough demand for it.
+If you are interested in any of these, please let the author know.
+
+ - Internationalization
+ - Improve build scripts 
+
 
 *****************************************************************************
+* Feedback:
+***********
 
 Please email me with any questions, comments or if you should find a bug at 
-david@mcbf.net.
+david@mcbf.net .
 
 
-Many thanks to Kjell Braden for sending some patches and getting 
+*****************************************************************************
+* Acknowledgments:
+******************
+
+Many thanks to Kjell Braden for sending some patches and getting
 grub-choose-default into debian!

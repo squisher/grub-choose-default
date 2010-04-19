@@ -1,2 +1,236 @@
-Version 0.3, 2008-05-29
-  Applied patches from Kjell Braden to fix some crashes and to add a manpage.
+2010-04-18  David Mohr <david@mcbf.net>
+
+  * src/grub-choose-default-main.c, wscript:
+    Remove terminal window for windows
+
+  * README, reboot/gnome, reboot/xfce4:
+    Update the logout scripts
+
+  * grub-choose-default.desktop, wscript:
+    Adding a .desktop entry
+
+  * EXPAT, grub-choose-default.sgml, icons/wscript_build,
+    src/grub-choose-default-window.c, wscript:
+    Improve the build system
+
+  * README, README.win32, icons/16x16/grub-choose-default.png,
+    icons/22x22/grub-choose-default.png, icons/24x24/grub-choose-default.png,
+    icons/32x32/grub-choose-default.png, icons/48x48/grub-choose-default.png,
+    icons/bitmap.sh, icons/scalable/grub-choose-default.svg,
+    win32/MUI_EXTRAPAGES.nsh, win32/grub-choose-default-logo.bmp,
+    win32/grub-choose-default-logo.xcf, win32/grub-choose-default.ico,
+    win32/win32-installer.nsi:
+    Update README, fix up the installer, updated icon and installer logo
+
+  * src/gchd-direct.c, src/gchd.c, src/gchd.h,
+    src/grub-choose-default-button-box.c,
+    src/grub-choose-default-button-box.h, src/grub-choose-default-window.c:
+    Allow passing the grub_dir to the button_box
+
+  * .gitignore, icons/bitmap.sh, icons/grub-choose-default.ico,
+    utils/win32-installer.nsi, utils/windows.bat,
+    win32/grub-choose-default-logo.bmp, win32/grub-choose-default.ico,
+    win32/win32-installer.nsi, win32/windows.bat, wscript:
+    Allow compiling windows in the same space as Linux
+
+  * icons/16x16/grub-choose-default.png, icons/22x22/grub-choose-default.png,
+    icons/24x24/grub-choose-default.png, icons/32x32/grub-choose-default.png,
+    icons/48x48/grub-choose-default.png, icons/bitmap.sh,
+    icons/grub-choose-default.ico, icons/scalable/grub-choose-default.svg:
+    Adding icons
+
+2010-04-17  David Mohr <david@mcbf.net>
+
+  * src/gchd.c, src/gchd.h, src/grub-choose-default-button-box.c,
+    src/grub-choose-default-window.c, utils/win32-installer.nsi, wscript:
+    Change version to 0.6, load and save settings, installer fixes
+
+2010-04-16  David Mohr <david@mcbf.net>
+
+  * COPYING, GPL-2, GPL-3, src/gchd-util.c, src/grub-choose-default-main.c,
+    utils/win32-installer.nsi:
+    Some windows fixes and an installer
+
+  * reboot/windows.vbs, utils/windows.bat:
+    Adding windows stuff
+
+  * src/grub-choose-default-window.c:
+    Take file extensions into account for windows reboot script, correctly run vbs
+
+  * src/gchd-direct.c, src/gchd-internal.h, src/gchd-util.c, src/gchd.c:
+    Use the gchd_get_grub_file everywhere, correctly save grub_dir
+
+  * src/gchd-direct.c, src/gchd-error.h, src/gchd-unix.c, src/gchd.c,
+    src/grub-choose-default-button-box.c, src/grub-choose-default-window.c,
+    wscript:
+    Improve debug/regular output, check mounts under windows for the grub configuration
+
+2010-04-15  David Mohr <david@mcbf.net>
+
+  * src/gchd-error.h, src/gchd-internal.h, src/gchd-menu.c, src/gchd-menu.h,
+    src/gchd-unix.c, src/gchd-util.c, src/gchd-util.h, src/gchd.c,
+    src/grub-envblk.c, src/wscript_build, wscript:
+    Introduce real debug printing, better cflags, better config.h handling, refactor function to find grub files
+
+2010-04-13  David Mohr <david@mcbf.net>
+
+  * src/gchd-direct.c, src/grub-choose-default-button-box.c,
+    src/grub-choose-default-main.c, src/grub-choose-default-util.c:
+    Better handling of errors
+
+2010-04-12  David Mohr <david@mcbf.net>
+
+  * src/gchd-direct.c:
+    Use g_build_filename
+
+  * src/gchd-direct.c, src/gchd-error.h:
+    Better error reporting
+
+  * src/wscript_build:
+    Don't link to gchd-unix.o when not needed
+
+  * src/gchd.c:
+    Only include unix when direct is not set
+
+  * src/gchd-direct.c, src/gchd-direct.h, src/gchd-error.h,
+    src/gchd-internal.h, src/gchd-unix.c, src/gchd-unix.h, src/gchd.c,
+    src/grub-envblk.c, src/grub-envblk.h, src/grub.c, src/grub.h,
+    src/wscript_build:
+    Add grub's envblk.c
+
+2010-04-11  David Mohr <david@mcbf.net>
+
+  * src/gchd-direct.c, src/gchd-direct.h, src/gchd-test.c, src/gchd-unix.c,
+    src/gchd-windows.c, src/gchd-windows.h, src/gchd.c, src/wscript_build,
+    wscript:
+    Renaming windows to direct support
+
+  * wscript:
+    Only build man page on unix
+
+  * src/gchd-windows.c, src/gchd-windows.h, src/wscript_build:
+    Adding some win32 support
+
+  * .gitignore:
+    Adding more ignores for waf
+
+2010-04-10  David Mohr <david@mcbf.net>
+
+  * .gitignore, Makefile, src/Makefile, src/wscript_build, waf, wscript:
+    Converting to waf
+
+2010-04-06  David Mohr <david@mcbf.net>
+
+  * src/gchd-error.h, src/grub-choose-default-window.c:
+    Report an error when reboot was selected but no scripts found
+
+  * src/gchd-unix.c:
+    Use sudo directly to set default entry
+
+  * src/grub-choose-default-button-box.c:
+    Don't try to report an error when there was none
+
+2010-04-05  David Mohr <david@mcbf.net>
+
+  * src/grub-choose-default-widget.c, src/grub-choose-default-window.c:
+    Adding reboot functionality
+
+  * src/grub-choose-default-button-box.c, src/grub-choose-default-util.c,
+    src/grub-choose-default-util.h:
+    Show all errors
+
+  * src/grub-choose-default-button-box.c:
+    Enable the highlighting again
+
+2010-04-04  David Mohr <david@mcbf.net>
+
+  * src/Makefile, src/grub-choose-default-button-box.c,
+    src/grub-choose-default-util.c, src/grub-choose-default-util.h:
+    Display errors
+
+  * src/grub-choose-default-button-box.c,
+    src/grub-choose-default-button-box.h, src/grub-choose-default-widget.c,
+    src/grub-choose-default-widget.h:
+    Get rid of the bold default label, move the signal into the interface
+
+  * src/Makefile, src/grub-choose-default-button-box.c,
+    src/grub-choose-default-widget.c, src/grub-choose-default-widget.h:
+    Adding interface, having the button-box implement it
+
+  * src/grub-choose-default-button-box.c:
+    Highlight default entry
+
+  * src/grub-choose-default-button-box.c,
+    src/grub-choose-default-button-box.h, src/grub-choose-default-window.c:
+    Adding signal
+
+  * src/.gitignore, src/Makefile, src/gchd-internal.h, src/gchd-menu-main.c,
+    src/gchd-test.c, src/gchd-unix.c, src/gchd.c, src/gchd.h:
+    Implementing setting through grub-set-default
+
+  * grub-choose-default.py, src/gchd-unix.c,
+    src/grub-choose-default-button-box.c:
+    Delete old script version
+
+2010-04-03  David Mohr <david@mcbf.net>
+
+  * src/Makefile, src/grub-choose-default-button-box.c:
+    Getting the gui to work again
+
+  * src/.gitignore, src/Makefile, src/gcd-error.c, src/gcd-error.h,
+    src/gchd-error.c, src/gchd-error.h, src/gchd-internal.h,
+    src/gchd-menu-main.c, src/gchd-menu.c, src/gchd-menu.h, src/gchd-unix.c,
+    src/gchd-unix.h, src/gchd.c, src/gchd.h, src/grub-menu-main.c,
+    src/grub-menu.c, src/grub-menu.h:
+    Getting the menu test to work again
+
+  * src/gchd-internal.h, src/gchd.c, src/gchd.h,
+    src/grub-choose-default-button-box.c, src/grub-choose-default-window.c,
+    src/grub-menu.h:
+    Improving public interface
+
+2010-03-31  David Mohr <david@mcbf.net>
+
+  * src/.gitignore, src/Makefile, src/gcd-error.c, src/gcd-error.h,
+    src/grub-choose-default-button-box.c,
+    src/grub-choose-default-button-box.h, src/grub-choose-default-main.c,
+    src/grub-choose-default-window.c, src/grub-choose-default-window.h,
+    src/grub-menu-main.c, src/grub-menu.c, src/grub-menu.h:
+    Initial import of base layout
+
+2010-03-30  David Mohr <david@mcbf.net>
+
+  * src/.gitignore:
+    Adding gitignore
+
+  * README:
+    Updating README
+
+2010-03-11  David Mohr <david@mcbf.net>
+
+  * src/grub-menu.c, src/grub-menu.h:
+    Adding void
+
+  * src/Makefile, src/grub-menu-main.c, src/grub-menu.c, src/grub-menu.h:
+    Putting the main / test function into its own file
+
+  * src/grub-menu.c:
+    Fix small memory leak
+
+  * src/grub-menu.c:
+    Adding cleanup function
+
+  * src/Makefile, src/grub-menu.c:
+    Adding a simple test Makefile, first version of grub-menu
+
+2010-03-09  David Mohr <david@mcbf.net>
+
+  * .gitignore, ChangeLog, Makefile, README, grub-choose-default.py,
+    grub-choose-default.sgml, reboot/xfce4:
+    Importing 0.3
+
+  * COPYING, README, grub-choose-default.py, reboot/gnome, reboot/xfce4:
+    Importing 0.2
+
+  * grub-choose-default.py:
+    Importing 0.1

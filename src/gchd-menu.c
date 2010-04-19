@@ -76,7 +76,7 @@ gchd_get_menu (Gchd *gchd, GError **error) {
   
   cfg = gchd_get_grub_file (gchd, "grub.cfg", error);
 
-  if (!cfg || !*cfg) {
+  if (!cfg) {
     return FALSE;
   }
 
