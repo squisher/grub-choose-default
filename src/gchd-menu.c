@@ -15,6 +15,7 @@ static gint
 parse_entries (GchdMenu *menu, gchar * contents) {
   gchar * cp, * c, * e;
   gchar * entry;
+  gchar quote;
   static const gchar *mi = "menuentry";
 
   for (cp = NULL, c = contents; *c != '\0'; cp = c, c++) {
@@ -35,12 +36,21 @@ parse_entries (GchdMenu *menu, gchar * contents) {
 
         /* expect the (opening) quotes */
         if (*c != '"')
-          continue;
+          if (*c != '\'')
+            continue;
+          else
+          {
+            quote = '\'';
+            c++;
+          }
         else
+        {
+          quote = '"';
           c++;
+        }
 
         /* find the (closing) quotes */
-        for (e = c; (*e != '\0') && (*e != '"'); e++) ;
+        for (e = c; (*e != '\0') && (*e != quote); e++) ;
 
         if (*e == '\0') {
           c = e;

@@ -3,3 +3,4 @@ _build*_
 .waf-*/
 waf-*/
 .lock*wscript
+tags

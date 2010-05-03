@@ -73,7 +73,7 @@ get_default_entry (Gchd * gchd, GError **error)
   env_filename = gchd_get_grub_file (gchd, "grubenv", error);
 
   if (env_filename == NULL)
-    return NULL;
+    return "";
 
   g_print ("Operating on %s\n", env_filename);
 

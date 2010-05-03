@@ -43,7 +43,11 @@ static const gchar * grub_config_locations[] = {
   NULL
 };
 
-
+/**
+ * gchd_new:
+ *
+ * Returns a new #Gchd object.
+ **/
 Gchd *
 gchd_new (void)
 {
@@ -60,6 +64,12 @@ gchd_new (void)
   return gchd;
 }
 
+/**
+ * gchd_free:
+ * @gchd  : a #Gchd.
+ *
+ * Frees the @gchd and its contents.
+ **/
 void
 gchd_free (Gchd *gchd)
 {
@@ -69,6 +79,18 @@ gchd_free (Gchd *gchd)
   g_free (gchd);
 }
 
+/**
+ * gchd_get_menu_entries:
+ * @gchd    : a #Gchd.
+ * @entries : the location where the list of entries will be stored.
+ * @error   : the error to be set if the entries could not be located.
+ *
+ * Determines the entries contained in grub.cfg, and stores them in @entries.
+ * These entries are owned by @gchd and should not be modified.
+ *
+ * Returns: the number of entries, or
+ *          -1 on error.
+ **/
 gint
 gchd_get_menu_entries (Gchd *gchd, GList **entries, GError **error)
 {
@@ -91,6 +113,17 @@ gchd_get_menu_entries (Gchd *gchd, GList **entries, GError **error)
   }
 }
 
+/**
+ * gchd_get_grub_file_from_root:
+ * @gchd    : a #Gchd.
+ * @root    : the root of the filesystem to search in as a string.
+ * @file    : the file name to search for as a string.
+ * @error   : the error to set if unexpected issues occurred.
+ *
+ * Searches in predetermined subdirectories for @file.
+ *
+ * Returns: the full path to the @file as a string to be freed by the caller.
+ **/
 gchar *
 gchd_get_grub_file_from_root (Gchd * gchd, const gchar * root, const gchar * file, GError **error)
 {
@@ -130,6 +163,20 @@ gchd_get_grub_file_from_root (Gchd * gchd, const gchar * root, const gchar * fil
   }
 }
 
+/**
+ * gchd_get_grub_file:
+ * @gchd  : a #Gchd.
+ * @file  : the file to open in the grub directory.
+ * @error : the error to be set if the file could not be opened.
+ *
+ * Searches for the specified @file in possible locations for grub
+ * directories.
+ * On Unix this is just a wrapper around gchd_get_grub_file_from_root,
+ * but on Windows it searches on all possible volumes.
+ *
+ * Returns: a string containing the full path to the file, which needs
+ *          to be freed by the caller.
+ **/
 gchar *
 gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
 {
@@ -202,6 +249,14 @@ gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
   return cfg;
 }
 
+/**
+ * gchd_set_grub_dir:
+ * @gchd      : a #Gchd.
+ * @grub_dir  : the string containing the grub directory to work with.
+ *
+ * Sets a grub directory. Usually used to avoid searching for the grub
+ * directory. The parameter @grub_dir can be freed after the call.
+ **/
 void
 gchd_set_grub_dir (Gchd * gchd, const gchar * grub_dir)
 {
@@ -209,14 +264,34 @@ gchd_set_grub_dir (Gchd * gchd, const gchar * grub_dir)
   gchd->grub_dir = g_strdup (grub_dir);
 }
 
+/**
+ * gchd_get_grub_directory:
+ * @gchd  : a #Gchd.
+ *
+ * Returns: the current grub directory, which may be %NULL. The string
+ *          should be freed by the caller.
+ **/
 const gchar *
 gchd_get_grub_dir (Gchd * gchd)
 {
-  return gchd->grub_dir;
+  return g_strdup (gchd->grub_dir);
 }
 
 /* interface functions */
 
+/**
+ * gchd_get_default_entry:
+ * @gchd  : a #Gchd.
+ * @error : error to be set if the default entry could not be determined.
+ *
+ * Find the default grub entry.
+ *
+ * Returns: a string containing the default entry if there was one,
+ *          "" if there is no default entry, and
+ *          %NULL if an error occurred.
+ *
+ *          The returned string needs to be freed.
+ **/
 gchar *
 gchd_get_default_entry (Gchd * gchd, GError **error)
 {
@@ -226,6 +301,17 @@ gchd_get_default_entry (Gchd * gchd, GError **error)
   return gchd->get_default_entry (gchd, error);
 }
 
+/**
+ * gchd_set_default_entry:
+ * @gchd  : a #Gchd.
+ * @entry : the default entry to boot.
+ * @error : error to be set if the default entry could not be set.
+ *
+ * Sets the default grub entry.
+ *
+ * Returns: %TRUE if setting the entry was successfull, or
+ *          %FALSE if an error occurred.
+ **/
 gboolean
 gchd_set_default_entry (Gchd * gchd, gchar * entry, GError **error)
 {

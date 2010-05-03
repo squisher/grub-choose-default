@@ -65,21 +65,21 @@ get_default_entry (Gchd * gchd, GError **error)
   argv[2] = NULL;
 
   r = g_spawn_sync (NULL,
-                argv,
-                NULL,
-                G_SPAWN_SEARCH_PATH,
-                NULL,
-                NULL,
-                &s_output,
-                &s_error,
-                &exit_status,
-                error);
+                    argv,
+                    NULL,
+                    G_SPAWN_SEARCH_PATH,
+                    NULL,
+                    NULL,
+                    &s_output,
+                    &s_error,
+                    &exit_status,
+                    error);
 
   if (!r)
   {
     /* an error occurred which is passed onto the caller through
      * the error argument */
-    return NULL;
+    return "";
   }
 
   lines = g_strsplit (s_output, "\n", -1);
@@ -130,15 +130,15 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
   argv[i++] = NULL;
 
   r = g_spawn_sync (NULL,
-                argv,
-                NULL,
-                G_SPAWN_SEARCH_PATH,
-                NULL,
-                NULL,
-                &s_output,
-                &s_error,
-                &exit_status,
-                error);
+                    argv,
+                    NULL,
+                    G_SPAWN_SEARCH_PATH,
+                    NULL,
+                    NULL,
+                    &s_output,
+                    &s_error,
+                    &exit_status,
+                    error);
 
   if (!r)
   {
