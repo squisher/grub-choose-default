@@ -34,14 +34,14 @@ SetCompressor lzma
 ###
 
 # Script version; displayed when running the installer
-!define GCHD_INSTALLER_VERSION "0.4"
+!define GCHD_INSTALLER_VERSION "0.5"
 
 # grub-choose-default program information
 !define PROGRAM_NAME "grub-choose-default"
-!define PROGRAM_VERSION "0.6"
+!define PROGRAM_VERSION "0.7"
 !define PROGRAM_WEB_SITE "http://ds.mcbf.net/wiki/GrubChooseDefault"
 
-# Installer for GTK+ 2.12 runtime; will be downloaded from grub-choose-default-torrent.org
+# Installer for GTK+ 2.12 runtime; will be downloaded
 !define GCHD_GTK_DEPENDENCY "gtk2-runtime-2.16.6-2010-02-24-ash.exe"
 
 
@@ -173,6 +173,11 @@ Section -StartMenu_Desktop_Links
   CreateShortCut "$SMPROGRAMS\grub-choose-default\Uninstall grub-choose-default.lnk" "$INSTDIR\grub-choose-default-uninst.exe"
 SectionEnd
 
+Section "Create desktop shortcut" Section2
+  SetShellVarContext current
+  CreateShortCut "$DESKTOP\grub-choose-default.lnk" "$INSTDIR\grub-choose-default.exe" "" "$INSTDIR\grub-choose-default.ico"
+SectionEnd
+
 Section -Uninstaller
   WriteUninstaller "$INSTDIR\grub-choose-default-uninst.exe"
   WriteRegStr ${PROGRAM_UNINST_ROOT_KEY} "${PROGRAM_UNINST_KEY}" "DisplayName" "$(^Name)"
@@ -181,7 +186,7 @@ Section -Uninstaller
 SectionEnd
 
 # Install GTK+ 2.16
-Section "GTK+ 2.16 runtime" Section2
+Section "GTK+ 2.16 runtime" Section3
   GTK_install_start:
   MessageBox MB_OK "You will now download and run the installer for the GTK+ 2.16 runtime. \
     You must be connected to the internet before you press the OK button. \
@@ -208,7 +213,8 @@ Section "GTK+ 2.16 runtime" Section2
 SectionEnd
 
 LangString DESC_Section1 ${LANG_ENGLISH} "Install grub-choose-default"
-LangString DESC_Section2 ${LANG_ENGLISH} "Download and install the GTK+ 2.16 runtime. \
+LangString DESC_Section2 ${LANG_ENGLISH} "Create a shortcut on the desktop for grub-choose-default"
+LangString DESC_Section3 ${LANG_ENGLISH} "Download and install the GTK+ 2.16 runtime. \
   This is skipped automatically if GTK+ is already installed."
 
 # Fields are: Title, subtitle, above text area, below text area
@@ -221,6 +227,7 @@ ${ReadmeLanguage} "${LANG_ENGLISH}" \
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${Section1} $(DESC_Section1)
   !insertmacro MUI_DESCRIPTION_TEXT ${Section2} $(DESC_Section2)
+  !insertmacro MUI_DESCRIPTION_TEXT ${Section3} $(DESC_Section3)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
