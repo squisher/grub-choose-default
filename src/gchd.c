@@ -217,6 +217,7 @@ gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
 
     f_root = g_mount_get_root (mnt);
     root = g_file_get_path (f_root);
+    DBG ("Considering root %s", root);
 
     if (strcmp (root, "A:\\") != 0)
     {

@@ -37,8 +37,10 @@ main (int argc, char **argv)
 
   gtk_init (&argc, &argv);
 
+#ifndef DEBUG
 #ifdef G_OS_WIN32
   g_set_print_handler (no_output_handler);
+#endif
 #endif
 
   win = grub_choose_default_window_new ();
