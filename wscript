@@ -40,6 +40,8 @@ def set_options (opt):
     def_direct = False
   opt.add_option ('--direct', action='store_true', default=def_direct, help='Directly work on grubenv, default under win32', dest='direct')
 
+  opt.add_option ('--distribution', action='store', default=1, help='Sets index of the error message to use, see gchd-messages.h for values', dest='distro')
+
 def configure (ctx):
   print "Configuring", APPNAME 
 
@@ -66,6 +68,9 @@ def configure (ctx):
   ctx.define ('PACKAGE', APPNAME)
   ctx.define ('DIRECT', 1 if Options.options.direct else 0)
   ctx.define ('DEBUG', 1 if Options.options.debug else 0)
+  # TODO: check distro range at this point, and not at runtime in gchd.c
+  ctx.define ('DISTRIBUTION', int(Options.options.distro))
+
 
   ctx.write_config_header ('config.h')
   ctx.env.append_value ('CCDEFINES', ['HAVE_CONFIG_H=1'])

@@ -37,6 +37,8 @@
 #  include <gio/gio.h>
 #endif
 
+#include "gchd-messages.h"
+
 static const gchar * grub_config_locations[] = {
   "boot" G_DIR_SEPARATOR_S "grub",
   "grub",
@@ -320,4 +322,45 @@ gchd_set_default_entry (Gchd * gchd, gchar * entry, GError **error)
   g_assert (!error || !*error);
 
   return gchd->set_default_entry (gchd, entry, error);
+}
+
+/**
+ * gchd_uses_default:
+ * @gchd  : a #Gchd.
+ * @error : error to be set if grub does not use the default entry.
+ *
+ * Checks if grub.cfg is set up to use the default entry set by the
+ * grub environment.
+ *
+ * When this returns false, user action is required, and instructions on
+ * what to do are returned in the error parameter.
+ *
+ * IMPORTANT: Requires that gchd_get_menu_entries has been called!
+ *
+ * Returns: %TRUE if grub is using the saved default,
+ *          %FALSE if grub is not set up correctly.
+ **/
+gboolean
+gchd_uses_default (Gchd * gchd, GError ** error)
+{
+#ifdef G_OS_WIN32
+  const gint index = 0;
+#else
+  const gint index = distro;
+#endif
+
+  g_assert (index >= 0 && index < n_not_using_default_message);
+
+  if (!gchd->menu.default_saved)
+  {
+    g_set_error (error,
+                 GCHD_ERROR,
+                 GCHD_ERROR_NOT_USING_DEFAULT,
+                 "Grub is not configured to use the default set by this program.\n"
+                 "\n"
+                 "%s", not_using_default_message[index]);
+    return FALSE;
+  }
+
+  return TRUE;
 }

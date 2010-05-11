@@ -17,11 +17,17 @@ parse_entries (GchdMenu *menu, gchar * contents) {
   gchar * entry;
   gchar quote;
   static const gchar *mi = "menuentry";
+  static const gchar *sd = "set default=\"${saved_entry}\"";
 
-  for (cp = NULL, c = contents; *c != '\0'; cp = c, c++) {
+  for (cp = NULL, c = contents; *c != '\0'; cp = c, c++)
+  {
     /* look for the letter 'm' at the beginning of a line */
-    if (*c == 'm' && (cp == NULL || *cp == '\n')) {
-      if (strncmp (c, mi, strlen(mi)) == 0) {
+    if (*c == 'm' && (cp == NULL || *cp == '\n'))
+    {
+      if (strncmp (c, mi, strlen(mi)) == 0)
+      {
+        /* matched "^menuentry */
+
         c += strlen (mi);
         /* we expect at least one white space */
 
@@ -64,6 +70,17 @@ parse_entries (GchdMenu *menu, gchar * contents) {
 
         menu->entries = g_list_prepend (menu->entries, entry);
         menu->n_entries++;
+      }
+    }
+    else if (*c == 's' && (cp == NULL || *cp == '\n'))
+    {
+      if (strncmp (c, sd, strlen(sd)) == 0)
+      {
+        /* Matched sd to the beginning of the line.
+         * That's good enough, we assume it's only spaces
+         * and comments on the remainder of the line. */
+
+        menu->default_saved = TRUE;
       }
     }
   }

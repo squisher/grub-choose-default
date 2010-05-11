@@ -28,6 +28,7 @@ typedef struct {
   gchar * loc;
   GList * entries; /* of type char* */
   gint n_entries;
+  gboolean default_saved;
 } GchdMenu;
 
 struct _Gchd {

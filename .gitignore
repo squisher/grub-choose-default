@@ -4,3 +4,5 @@ _build*_
 waf-*/
 .lock*wscript
 tags
+*-stamp
+*.tar.bz2*

@@ -286,7 +286,12 @@ commit (GrubChooseDefaultWidget * widget, GError **report_error)
 
   GError *my_error = NULL;
   GError **error;
+  GError *def_error = NULL;
   gboolean r;
+
+  /* if report_error is not set, then we grab the
+   * error ourselves and report it to the user.
+   */
 
   if (report_error == NULL)
     error = &my_error;
@@ -300,6 +305,15 @@ commit (GrubChooseDefaultWidget * widget, GError **report_error)
     grub_choose_default_error (gtk_widget_get_toplevel (GTK_WIDGET (widget)),
                                my_error);
     g_error_free (my_error);
+  }
+
+  if (!gchd_uses_default (priv->gchd, &def_error))
+  {
+    /* warn the user if grub is not configured correctly */
+
+    grub_choose_default_error (gtk_widget_get_toplevel (GTK_WIDGET (widget)),
+                               def_error);
+    g_error_free (def_error);
   }
 
   return r;
