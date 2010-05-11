@@ -1,0 +1,6 @@
+ v0.7   2010-05-11
+-------------------
+ * Don't crash if there is no default saved yet
+ * Parse the single quotes in grub.cfg that Ubuntu uses
+ * Check grub.cfg for the saved_default setting and
+   display a message if it is missing
