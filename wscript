@@ -32,6 +32,8 @@ if IS_DEV:
 
 
 def set_options (opt):
+  opt.tool_options('gnu_dirs')
+
   opt.add_option ('--debug', action='store_true', default=False, help='Enable debugging code', dest='debug')
 
   if Options.platform == 'win32':
@@ -46,6 +48,7 @@ def configure (ctx):
   print "Configuring", APPNAME 
 
   ctx.check_tool ('gcc')
+  ctx.check_tool ('gnu_dirs')
   ctx.check_cfg (package='gtk+-2.0', args='--cflags --libs', uselib_store='GTK', mandatory=True)
   if Options.platform != 'win32':
     if ctx.find_program ('docbook-to-man', var='DOCBOOKTOMAN'):
@@ -89,6 +92,11 @@ def build (ctx):
           rule = ctx.env.DOCBOOKTOMAN + ' ${SRC} > ${TGT}',
           source = 'grub-choose-default.sgml',
           target = 'grub-choose-default.8',
-          install_path = '${PREFIX}/share/man/man8',
+          install_path = '${MANDIR}/man8',
           )
-    ctx.install_files ("${PREFIX}/share/applications", "grub-choose-default.desktop");
+    ctx.install_files ("${DATADIR}/applications", "grub-choose-default.desktop");
+
+  ctx.install_files ('${DOCDIR}/',
+                     'AUTHORS GPL-2 GPL-3 ChangeLog EXPAT README NEWS')
+  ctx.install_files ('${DOCDIR}/',
+                     ctx.path.ant_glob('reboot/*'), relative_trick=True)

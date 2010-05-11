@@ -12,5 +12,5 @@ for size in [16, 22, 24, 32, 48, 'scalable']:
   except ValueError, e:
     d = str(size)
 
-  bld.install_files ('${PREFIX}/share/icons/hicolor/' + d + '/' + 'apps',
+  bld.install_files ('${DATADIR}/icons/hicolor/' + d + '/' + 'apps',
                      d + '/grub-choose-default.*')
