@@ -89,6 +89,6 @@ def build (ctx):
           rule = ctx.env.DOCBOOKTOMAN + ' ${SRC} > ${TGT}',
           source = 'grub-choose-default.sgml',
           target = 'grub-choose-default.8',
-          install_path = '${PREFIX}/usr/share/man/man8',
+          install_path = '${PREFIX}/share/man/man8',
           )
-    ctx.install_files ("${PREFIX}/usr/share/applications", "grub-choose-default.desktop");
+    ctx.install_files ("${PREFIX}/share/applications", "grub-choose-default.desktop");
