@@ -112,9 +112,11 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
   gboolean b;
   gchar * env_filename;
 
+  r = 0;
   env_filename = gchd_get_grub_file (gchd, "grubenv", error);
 
-  r = grub_envblk_set (priv->env, default_key, entry);
+  if (env_filename)
+    r = grub_envblk_set (priv->env, default_key, entry);
 
   if (!r)
   {
