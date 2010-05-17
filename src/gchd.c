@@ -134,6 +134,8 @@ gchd_get_grub_file_from_root (Gchd * gchd, const gchar * root, const gchar * fil
   const gchar ** base;
   gboolean r;
 
+  g_assert (error == NULL || *error == NULL);
+
   for (base = grub_config_locations; *base != NULL; base++)
   {
     cfg = g_build_filename (root, *base, file, NULL);
@@ -254,7 +256,7 @@ gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
   cfg = gchd_get_grub_file_from_root (gchd, "/", file, error);
 #endif
 
-  if (cfg == NULL)
+  if (cfg == NULL && error && *error == NULL)
   {
     /* We never found the directory */
     g_set_error (error, GCHD_ERROR,

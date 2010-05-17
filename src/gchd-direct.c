@@ -72,8 +72,16 @@ get_default_entry (Gchd * gchd, GError **error)
 
   env_filename = gchd_get_grub_file (gchd, "grubenv", error);
 
-  if (env_filename == NULL)
+  if (env_filename == NULL) {
+    /* we did not find grubenv, so assume that no default is set */
+    if (*error)
+    {
+      g_error_free (*error);
+      *error = NULL;
+    }
+
     return "";
+  }
 
   g_print ("Operating on %s\n", env_filename);
 
