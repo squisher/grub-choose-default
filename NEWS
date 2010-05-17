@@ -1,3 +1,9 @@
+ v0.8   2010-05-17
+-------------------
+ * Don't crash when there is no grubenv file yet
+ * Use gnu data dirs for installation, and put files in the right places
+ * Install the supplied reboot scripts into the doc directory
+
  v0.7   2010-05-11
 -------------------
  * Don't crash if there is no default saved yet

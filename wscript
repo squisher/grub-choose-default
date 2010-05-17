@@ -18,7 +18,7 @@ else:
   out = '_build_'
 
 APPNAME = 'grub-choose-default'
-VERSION = '0.7'
+VERSION = '0.8'
 IS_DEV=False
 
 
@@ -43,6 +43,7 @@ def set_options (opt):
   opt.add_option ('--direct', action='store_true', default=def_direct, help='Directly work on grubenv, default under win32', dest='direct')
 
   opt.add_option ('--distribution', action='store', default=1, help='Sets index of the error message to use, see gchd-messages.h for values', dest='distro')
+
 
 def configure (ctx):
   print "Configuring", APPNAME 
@@ -81,6 +82,7 @@ def configure (ctx):
   if Options.options.debug:
     ctx.env.append_value ('CCFLAGS', '-Wall -O0 -g'.split ())
 
+
 def build (ctx):
   #ctx.recurse ('src')
   ctx.add_subdirs ('src')
@@ -95,8 +97,8 @@ def build (ctx):
           install_path = '${MANDIR}/man8',
           )
     ctx.install_files ("${DATADIR}/applications", "grub-choose-default.desktop");
+    ctx.install_files ('${DOCDIR}/',
+                       ctx.path.ant_glob('reboot/*'), relative_trick=True)
 
   ctx.install_files ('${DOCDIR}/',
                      'AUTHORS GPL-2 GPL-3 ChangeLog EXPAT README NEWS')
-  ctx.install_files ('${DOCDIR}/',
-                     ctx.path.ant_glob('reboot/*'), relative_trick=True)
