@@ -18,6 +18,14 @@
 
 #include "grub-choose-default-util.h"
 
+/**
+ * grub_choose_default_error:
+ * #parent  : a parent window, or NULL
+ * #error   : an error to display
+ *
+ * Displays the message of #error. A modal dialog is used if the optional
+ * parameter #parent is non-%NULL.
+ **/
 void
 grub_choose_default_error (GtkWidget *parent, GError *error)
 {

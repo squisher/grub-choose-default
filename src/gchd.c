@@ -124,7 +124,8 @@ gchd_get_menu_entries (Gchd *gchd, GList **entries, GError **error)
  *
  * Searches in predetermined subdirectories for @file.
  *
- * Returns: the full path to the @file as a string to be freed by the caller.
+ * Returns: the full path to the @file as a string to be freed by the caller, or
+ *          %NULL if no file was found, and error is set accordingly.
  **/
 gchar *
 gchd_get_grub_file_from_root (Gchd * gchd, const gchar * root, const gchar * file, GError **error)
@@ -177,7 +178,8 @@ gchd_get_grub_file_from_root (Gchd * gchd, const gchar * root, const gchar * fil
  * but on Windows it searches on all possible volumes.
  *
  * Returns: a string containing the full path to the file, which needs
- *          to be freed by the caller.
+ *          to be freed by the caller, or
+ *          %NULL on error.
  **/
 gchar *
 gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
@@ -207,9 +209,6 @@ gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
   mounts = g_list_reverse (mounts);
 
   cfg = NULL;
-  g_set_error (error, GCHD_ERROR,
-               GCHD_ERROR_NO_VOLUMES,
-               "No volumes were found in the system");
 
   for (iter = mounts; iter != NULL && cfg == NULL; iter = g_list_next (iter))
   {
@@ -219,12 +218,15 @@ gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
 
     f_root = g_mount_get_root (mnt);
     root = g_file_get_path (f_root);
-    DBG ("Considering root %s", root);
 
     if (strcmp (root, "A:\\") != 0)
     {
       DBG ("Using root %s", root);
 
+    /* There could be a left-over error from the past iteration.
+     * Note that we free it in the beginning, because the last error
+     * needs to be kept to pass on to the caller.
+     */
       if (error && *error)
       {
         g_error_free (*error);
@@ -246,8 +248,19 @@ gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error)
   g_list_free (mounts);
   g_object_unref (volmon);
 #else
+  /* FIXME: is it fair to assume that on Unix the file will always be
+   * in /boot/grub ?
+   */
   cfg = gchd_get_grub_file_from_root (gchd, "/", file, error);
 #endif
+
+  if (cfg == NULL)
+  {
+    /* We never found the directory */
+    g_set_error (error, GCHD_ERROR,
+                GCHD_ERROR_NO_VOLUMES,
+                "No volumes were found in the system");
+  }
 
   return cfg;
 }

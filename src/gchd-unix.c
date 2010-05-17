@@ -79,7 +79,7 @@ get_default_entry (Gchd * gchd, GError **error)
   {
     /* an error occurred which is passed onto the caller through
      * the error argument */
-    return "";
+    return NULL;
   }
 
   lines = g_strsplit (s_output, "\n", -1);
@@ -94,6 +94,14 @@ get_default_entry (Gchd * gchd, GError **error)
       default_entry = g_strdup (value);
       break;
     }
+  }
+
+  if (default_entry == NULL)
+  {
+    /* The output was not parseable, just assume no default is set.
+     * This happens when grubenv does not yet exist (is not initialized).
+     * FIXME: could there be other reasons that we need to treat differently? */
+    default_entry = "";
   }
 
   return default_entry;
