@@ -19,7 +19,9 @@ main (int argc, char **argv) {
   gint n_entries;
   GList * entries;
   gchar *def_entry;
+#if 0
   gboolean r;
+#endif
 
 
   gchd = gchd_new ();

@@ -46,7 +46,7 @@ typedef struct {
 static gchar * get_default_entry (Gchd * gchd, GError **error);
 static gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
 static int find (const char *name, const char *value);
-static void signal_set_done (gpointer data);
+static gboolean signal_set_done (gpointer data);
 
 
 /* implementations */
@@ -156,7 +156,7 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
   return TRUE;
 }
 
-static void
+static gboolean
 signal_set_done (gpointer data)
 {
   Gchd * gchd = (Gchd *) data;
@@ -166,6 +166,8 @@ signal_set_done (gpointer data)
   /* this function is only called when setting the default
    * succeeded, so we always signal TRUE here */
   gchd->set_callback (gchd, TRUE, NULL, gchd->set_callback_data);
+
+  return FALSE;
 }
 
 static int
