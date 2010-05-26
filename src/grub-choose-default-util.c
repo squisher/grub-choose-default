@@ -29,15 +29,29 @@
 void
 grub_choose_default_error (GtkWidget *parent, GError *error)
 {
+  grub_choose_default_error_message (parent, error->message);
+}
+
+/**
+ * grub_choose_default_error:
+ * #parent  : a parent window, or NULL
+ * #message : an error message to display
+ *
+ * Displays the message of #error. A modal dialog is used if the optional
+ * parameter #parent is non-%NULL.
+ **/
+void
+grub_choose_default_error_message (GtkWidget *parent, gchar * message)
+{
   GtkWidget *dialog;
 
   dialog = gtk_message_dialog_new (GTK_WINDOW (parent),
                                    (parent != NULL) ? GTK_DIALOG_MODAL : 0,
                                    GTK_MESSAGE_ERROR,
                                    GTK_BUTTONS_CLOSE,
-                                   "%s", error->message);
+                                   "%s", message);
 
-  g_warning ("%s", error->message);
+  g_warning ("%s", message);
 
   gtk_dialog_run (GTK_DIALOG (dialog));
 

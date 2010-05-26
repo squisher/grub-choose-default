@@ -31,6 +31,7 @@
 
 static void grub_choose_default_widget_interface_init (GrubChooseDefaultWidgetInterface *iface);
 static GObject * grub_choose_default_button_box_constructor (GType type, guint n_properties, GObjectConstructParam * properties);
+static void set_default_done_callback (Gchd *gchd, gboolean success, gchar * error, gpointer data);
 
 static gboolean commit (GrubChooseDefaultWidget * widget, GError **error);
 
@@ -273,9 +274,13 @@ button_clicked (GtkButton *button, gpointer user_data)
   if (priv->autocommit)
   {
     commit (GRUB_CHOOSE_DEFAULT_WIDGET (bbox), NULL);
-  }
 
-  g_signal_emit (bbox, widget_class->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED], 0, label);
+    /* the signal is emitted in the callback added by commit */
+  }
+  else
+  {
+    g_signal_emit (bbox, widget_class->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED], 0, label);
+  }
 }
 
 static gboolean
@@ -298,7 +303,7 @@ commit (GrubChooseDefaultWidget * widget, GError **report_error)
   else
     error = report_error;
 
-  r = gchd_set_default_entry (priv->gchd, priv->def_entry, error);
+  r = gchd_set_default_entry (priv->gchd, priv->def_entry, set_default_done_callback, bbox, error);
 
   if (!r && report_error == NULL)
   {
@@ -317,6 +322,22 @@ commit (GrubChooseDefaultWidget * widget, GError **report_error)
   }
 
   return r;
+}
+
+static void
+set_default_done_callback (Gchd *gchd, gboolean success, gchar * error, gpointer data)
+{
+  GrubChooseDefaultButtonBox *bbox = GRUB_CHOOSE_DEFAULT_BUTTON_BOX (data);
+  GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (bbox);
+  GrubChooseDefaultWidgetInterface * widget_class = g_type_default_interface_peek (GRUB_CHOOSE_DEFAULT_TYPE_WIDGET);
+
+  if (!success)
+  {
+    grub_choose_default_error_message (gtk_widget_get_toplevel (GTK_WIDGET (bbox)), error);
+    g_free (error);
+  }
+
+  g_signal_emit (bbox, widget_class->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED], 0, priv->def_entry);
 }
 
 /*******************/

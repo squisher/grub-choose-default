@@ -78,6 +78,7 @@ gchd_free (Gchd *gchd)
   gchd_menu_free (&(gchd->menu));
 
   g_free (gchd->grub_dir);
+  g_free (gchd->data);
   g_free (gchd);
 }
 
@@ -321,20 +322,26 @@ gchd_get_default_entry (Gchd * gchd, GError **error)
 
 /**
  * gchd_set_default_entry:
- * @gchd  : a #Gchd.
- * @entry : the default entry to boot.
- * @error : error to be set if the default entry could not be set.
+ * @gchd     : a #Gchd.
+ * @entry    : default entry to boot.
+ * @callback : function to call once setting the default is done.
+ * @data     : pointer to pass to the callback.
+ * @error    : error to be set if the default entry could not be set.
  *
- * Sets the default grub entry.
+ * Sets the default grub entry. This is an asynchronous function which
+ * issues a callback once setting the entry is done.
  *
- * Returns: %TRUE if setting the entry was successfull, or
+ * Returns: %TRUE if the precondition for setting the default is met,
  *          %FALSE if an error occurred.
  **/
 gboolean
-gchd_set_default_entry (Gchd * gchd, gchar * entry, GError **error)
+gchd_set_default_entry (Gchd * gchd, gchar * entry, GchdSetDefaultCallback callback, gpointer data, GError **error)
 {
   g_assert (gchd->set_default_entry != NULL);
   g_assert (!error || !*error);
+
+  gchd->set_callback = callback;
+  gchd->set_callback_data = data;
 
   return gchd->set_default_entry (gchd, entry, error);
 }

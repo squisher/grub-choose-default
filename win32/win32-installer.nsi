@@ -38,7 +38,7 @@ SetCompressor lzma
 
 # grub-choose-default program information
 !define PROGRAM_NAME "grub-choose-default"
-!define PROGRAM_VERSION "0.7"
+!define PROGRAM_VERSION "0.9"
 !define PROGRAM_WEB_SITE "http://ds.mcbf.net/wiki/GrubChooseDefault"
 
 # Installer for GTK+ 2.12 runtime; will be downloaded

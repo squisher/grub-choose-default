@@ -21,18 +21,28 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <signal.h>
 
 #include "gchd-unix.h"
 #include "gchd-util.h"
 
 static const gchar * default_key = "saved_entry";
-
+#define TIMEOUT_MSEC 250
 
 /* prototypes */
 
 static gchar * get_default_entry (Gchd * gchd, GError **error);
 static gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
+static void set_exit (GPid pid, gint status, gpointer data);
+static gboolean set_timeout (gpointer data);
 
+typedef struct {
+  guint set_id;
+  guint set_timeout_id;
+  GPid child_pid;
+} GchdUnixPrivate;
+
+#define GCHD_UNIX_PRIVATE(x) (((GchdUnixPrivate *)((x)->data)))
 
 /* implementations */
 
@@ -43,6 +53,8 @@ gchd_unix_init (Gchd * gchd)
 
   gchd->get_default_entry = get_default_entry;
   gchd->set_default_entry = set_default_entry;
+
+  gchd->data = g_new0 (GchdUnixPrivate, 1);
 }
 
 static gchar *
@@ -114,9 +126,6 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
    * grub-set-default $entry
    */
   gchar * argv [4];
-  gchar * s_output;
-  gchar * s_error;
-  gint exit_status;
   gboolean r;
   gint i;
 
@@ -137,16 +146,14 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
   argv[i++] = entry;
   argv[i++] = NULL;
 
-  r = g_spawn_sync (NULL,
-                    argv,
-                    NULL,
-                    G_SPAWN_SEARCH_PATH,
-                    NULL,
-                    NULL,
-                    &s_output,
-                    &s_error,
-                    &exit_status,
-                    error);
+  r = g_spawn_async (NULL,
+                     argv,
+                     NULL,
+                     G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
+                     NULL,
+                     NULL,
+                     &(GCHD_UNIX_PRIVATE (gchd)->child_pid),
+                     error);
 
   if (!r)
   {
@@ -155,5 +162,56 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
     return FALSE;
   }
 
+  GCHD_UNIX_PRIVATE (gchd)->set_id = g_child_watch_add (GCHD_UNIX_PRIVATE (gchd)->child_pid, set_exit, gchd);
+
+  GCHD_UNIX_PRIVATE (gchd)->set_timeout_id = g_timeout_add (TIMEOUT_MSEC, set_timeout, gchd);
+  
   return TRUE;
+}
+
+static void
+set_exit (GPid pid, gint status, gpointer data)
+{
+  Gchd * gchd = (Gchd *) data;
+
+  gchar * msg;
+  gboolean r;
+
+  g_source_remove (GCHD_UNIX_PRIVATE (gchd)->set_timeout_id);
+
+  if (status != 0)
+  {
+    DBG ("setting the default entry returned with status %d", status);
+    r = FALSE;
+    msg = "Setting the default entry failed.";
+  }
+  else
+  {
+    DBG ("Setting default entry succeeded.");
+    r = TRUE;
+    msg = NULL;
+  }
+
+  g_spawn_close_pid (GCHD_UNIX_PRIVATE (gchd)->child_pid);
+
+  gchd->set_callback (gchd, r, msg, gchd->set_callback_data);
+}
+
+static gboolean
+set_timeout (gpointer data)
+{
+  Gchd * gchd = (Gchd *) data;
+
+  g_source_remove (GCHD_UNIX_PRIVATE (gchd)->set_id);
+  
+  kill (GCHD_UNIX_PRIVATE (gchd)->child_pid, SIGKILL);
+
+  g_spawn_close_pid (GCHD_UNIX_PRIVATE (gchd)->child_pid);
+
+  DBG ("Timed out while setting default entry");
+
+  gchd->set_callback (gchd, FALSE, "Setting the default entry timed out.", gchd->set_callback_data);
+
+  /* Remove the timeout */
+  return FALSE;
 }

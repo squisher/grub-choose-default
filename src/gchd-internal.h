@@ -32,14 +32,19 @@ typedef struct {
 } GchdMenu;
 
 struct _Gchd {
+  /* virtual functions */
   gchar * (*get_default_entry) (Gchd * gchd, GError **error);
   gboolean (*set_default_entry) (Gchd * gchd, gchar * entry, GError **error);
 
-  gpointer * data;
+  /* private data for the virtual functions */
+  gpointer data;
 
   GchdMenu menu;
   gchar * default_entry;
   gchar * grub_dir;
+
+  GchdSetDefaultCallback set_callback;
+  gpointer set_callback_data;
 };
 
 gchar * gchd_get_grub_file (Gchd * gchd, const gchar * file, GError **error);

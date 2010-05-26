@@ -35,6 +35,7 @@ static gchar * default_entry = NULL;
 typedef struct {
   gchar * contents;
   grub_envblk_t env;
+  gboolean set_result;
 } GchdDirectPrivate;
 
 #define GCHD_DIRECT_PRIVATE(x) ((GchdDirectPrivate *)(x))
@@ -45,6 +46,7 @@ typedef struct {
 static gchar * get_default_entry (Gchd * gchd, GError **error);
 static gboolean set_default_entry (Gchd * gchd, gchar * entry, GError **error);
 static int find (const char *name, const char *value);
+static void signal_set_done (gpointer data);
 
 
 /* implementations */
@@ -147,7 +149,23 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
     return FALSE;
   }
 
+  /* an idle function makes sure the callback is issued strictly after this
+   * function returns */
+  g_idle_add (signal_set_done, gchd);
+
   return TRUE;
+}
+
+static void
+signal_set_done (gpointer data)
+{
+  Gchd * gchd = (Gchd *) data;
+
+  g_assert (gchd != NULL);
+
+  /* this function is only called when setting the default
+   * succeeded, so we always signal TRUE here */
+  gchd->set_callback (gchd, TRUE, NULL, gchd->set_callback_data);
 }
 
 static int

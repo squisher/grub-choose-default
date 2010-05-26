@@ -24,13 +24,26 @@ G_BEGIN_DECLS
 
 typedef struct _Gchd Gchd;
 
+/**
+ * GchdSetDefaultCallback:
+ * @gchd    : a #Gchd instance
+ * @success : the success of setting the default
+ * @error   : if success is %FALSE, then @error contains the reason
+ * @data    : the data pointer that was added when the callback was set up
+ *
+ * Callback to pass to gchd_set_default_entry. If success is %FALSE, then
+ * error contains a string describing the reason. Error should be freed by
+ * the callback function.
+ **/
+typedef void (*GchdSetDefaultCallback) (Gchd *gchd, gboolean success, gchar * error, gpointer data);
+
 Gchd * gchd_new (void);
 void gchd_free (Gchd *gchd);
 
 gint gchd_get_menu_entries (Gchd * gchd, GList **entries, GError **error);
 
 gchar * gchd_get_default_entry (Gchd * gchd, GError **error);
-gboolean gchd_set_default_entry (Gchd * gchd, gchar * entry, GError **error);
+gboolean gchd_set_default_entry (Gchd * gchd, gchar * entry, GchdSetDefaultCallback callback, gpointer data, GError **error);
 gboolean gchd_uses_default (Gchd * gchd, GError ** error);
 
 void gchd_set_grub_dir (Gchd * gchd, const gchar * grub_dir);

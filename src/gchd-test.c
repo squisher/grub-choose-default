@@ -44,6 +44,9 @@ main (int argc, char **argv) {
 
   g_print ("\nDefault entry: %s\n", def_entry);
 
+#if 0
+  /* right now gchd-test doesn't use a main loop, so
+   * let's forget about the async call for now */
   if (argc > 1)
   {
     gchar * entry = argv[1];
@@ -60,6 +63,7 @@ main (int argc, char **argv) {
   {
     g_print ("Not setting default entry, none specified\n");
   }
+#endif
 
   gchd_free (gchd);
 

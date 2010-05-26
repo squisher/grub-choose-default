@@ -24,6 +24,7 @@
 G_BEGIN_DECLS
 
 void grub_choose_default_error (GtkWidget *parent, GError *error);
+void grub_choose_default_error_message (GtkWidget *parent, gchar * message);
 
 G_END_DECLS
 
