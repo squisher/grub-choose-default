@@ -149,6 +149,8 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 
   load_settings (self);
 
+  gtk_window_set_icon_name (GTK_WINDOW (self), "grub-choose-default");
+
   area = gtk_dialog_get_content_area (GTK_DIALOG (self));
 
   scrolled = gtk_scrolled_window_new (NULL, NULL);
