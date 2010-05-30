@@ -146,6 +146,7 @@ def build (ctx):
     files += 'ChangeLog NEWS AUTHORS '
     files += 'EXPAT GPL-2 GPL-3 '
     files += 'update-changelog.py waf '
+    files += 'grub-choose-default.desktop grub-choose-default.sgml '
     files += 'wscript src/wscript_build '
 
     distdir = ('%(package)s-%(version)s') % { 'package': APPNAME, 'version': VERSION }
