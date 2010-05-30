@@ -10,6 +10,8 @@
 
 import Options
 import Utils
+import os
+import shutil
 
 top = '.'
 if Options.platform == 'win32':
@@ -35,6 +37,7 @@ def set_options (opt):
   opt.tool_options('gnu_dirs')
 
   opt.add_option ('--debug', action='store_true', default=False, help='Enable debugging code', dest='debug')
+  opt.add_option ('--package', action='store_true', default=False, help='Create a source distribution, use with the \'build\' target', dest='package')
 
   if Options.platform == 'win32':
     def_direct = True
@@ -102,3 +105,57 @@ def build (ctx):
 
   ctx.install_files ('${DOCDIR}/',
                      'AUTHORS GPL-2 GPL-3 ChangeLog EXPAT README NEWS')
+
+  if Options.options.package:
+    #
+    # this is all pretty hackish, but works
+    #
+    print "Creating package..."
+
+    def glob (dirname, pattern):
+      return dirname, ctx.path.ant_glob (dirname + '/' + '*.c', relative_trick=True) + ' '
+
+    dirs = []
+    files = ''
+
+    d, fns  = glob ('src', '*.c')
+    dirs.append(d)
+    files += fns
+    d, fns = glob ('src', '*.h')
+    dirs.append(d)
+    files += fns
+    d, fns = glob ('reboot', '*')
+    dirs.append(d)
+    files += fns
+    d, fns = glob ('icons', '**')
+    dirs.append(d)
+    files += fns
+    d, fns = glob ('win32', '**')
+    dirs.append(d)
+    files += fns
+
+    files += ctx.path.ant_glob ('README*', relative_trick=True) + ' '
+    files += 'ChangeLog NEWS AUTHORS '
+    files += 'EXPAT GPL-2 GPL-3 '
+    files += 'update-changelog.py waf '
+    files += 'wscript src/wscript_build '
+
+    distdir = ('%(package)s-%(version)s') % { 'package': APPNAME, 'version': VERSION }
+    tarname = distdir + '.tar.bz2'
+
+    # copy all the files into the appropriate subdirectory
+    os.mkdir (distdir)
+    for d in [distdir + '/' + x for x in set(dirs)]:
+      #print d
+      os.mkdir (d)
+    for f in files.split (' '):
+      if f:
+        shutil.copy (f, distdir + '/' + f)
+
+    Utils.exec_command ('tar cjf ' + tarname + ' ' + distdir)
+    Utils.exec_command ('sha1sum ' + tarname + ' > ' + tarname + '.SHA1')
+
+    print "... " + tarname + " created"
+    shutil.rmtree (distdir)
+    return
+
