@@ -5,6 +5,13 @@ of that folder.
 If you have your root or boot directory on an ext2/3 partition, then you can
 easily make it available under Windows using the ext2 Windows FS driver from 
   http://www.fs-driver.org/
+Note that this driver, Ext2IFS, does not work with larger partitions. The
+correct setup here is to put /boot on its own partition. Then Ext2IFS will
+work just fine.
+There is another ext3 driver project, called Ext2Fsd. At least at version 0.48
+the driver was unreliable - it created a "shadow" grub environment, and
+broke grub-choose-default until the shadow file was manually removed.
+
 Once this directory is available under Windows, grub-choose-default should
 automatically find it by probing all available Windows drive letters.
 

@@ -21,7 +21,7 @@ else:
 
 APPNAME = 'grub-choose-default'
 VERSION = '0.9'
-IS_DEV=True
+IS_DEV=False
 
 
 if IS_DEV:

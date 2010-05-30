@@ -1,3 +1,9 @@
+ v0.9   2010-05-30
+-------------------
+ * Use the icon for the window as well
+ * Report an error when running grub-set-default failed
+ * Update the Windows README
+
  v0.8   2010-05-17
 -------------------
  * Don't crash when there is no grubenv file yet

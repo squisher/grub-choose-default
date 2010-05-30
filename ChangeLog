@@ -1,4 +1,49 @@
+2010-05-30  David Mohr <david@mcbf.net>
+
+  * wscript:
+    Implement our own package command. Only the files I want are included, and the tar extracts into the appropriate subdirectory.
+
+2010-05-26  David Mohr <david@mcbf.net>
+
+  * src/gchd-direct.c, src/gchd-test.c:
+    Fixing warnings
+
+  * src/grub-choose-default-window.c:
+    Use the icon for the window as well
+
+  * src/gchd-direct.c, src/gchd-internal.h, src/gchd-test.c, src/gchd-unix.c,
+    src/gchd.c, src/gchd.h, src/grub-choose-default-button-box.c,
+    src/grub-choose-default-util.c, src/grub-choose-default-util.h,
+    win32/win32-installer.nsi:
+    Asynchronous setting of the default entry so that we can use a timeout.
+
+2010-05-17  David Mohr <david@mcbf.net>
+
+  * src/gchd-direct.c, src/gchd.c:
+    Don't overwrite error when grub.cfg is not found
+
+  * wscript:
+    Post release bump
+
+  * NEWS, README, wscript:
+    Preparing for release
+
+  * src/gchd-direct.c:
+    Gracefully handle setting the default entry with the direct method when no grubenv was found
+
+  * src/gchd-unix.c, src/gchd.c, src/grub-choose-default-util.c:
+    Improve docs, fix memory leak, don't segfault on Linux when grubenv is missing
+
 2010-05-11  David Mohr <david@mcbf.net>
+
+  * AUTHORS, icons/wscript_build, wscript:
+    Use gnu dirs, install the docs
+
+  * icons/wscript_build, wscript:
+    Correctly take $PREFIX into account
+
+  * ChangeLog, NEWS, README, wscript:
+    Prepare for release
 
   * .gitignore, src/gchd-error.h, src/gchd-internal.h, src/gchd-menu.c,
     src/gchd-messages.h, src/gchd.c, src/gchd.h,
