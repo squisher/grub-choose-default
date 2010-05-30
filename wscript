@@ -113,25 +113,33 @@ def build (ctx):
     print "Creating package..."
 
     def glob (dirname, pattern):
-      return dirname, ctx.path.ant_glob (dirname + '/' + '*.c', relative_trick=True) + ' '
+      files = ctx.path.ant_glob (dirname + '/' + pattern, relative_trick=True) + ' '
+
+      # find all subdirectories
+      dirs = set([dirname])
+      for f in files.rstrip().split(' '):
+        subdir = os.path.dirname (f)
+        dirs.add(subdir)
+      
+      return dirs, files
 
     dirs = []
     files = ''
 
     d, fns  = glob ('src', '*.c')
-    dirs.append(d)
+    dirs += d
     files += fns
     d, fns = glob ('src', '*.h')
-    dirs.append(d)
+    dirs += d
     files += fns
     d, fns = glob ('reboot', '*')
-    dirs.append(d)
+    dirs += d
     files += fns
-    d, fns = glob ('icons', '**')
-    dirs.append(d)
+    d, fns = glob ('icons', '**/*')
+    dirs += d
     files += fns
-    d, fns = glob ('win32', '**')
-    dirs.append(d)
+    d, fns = glob ('win32', '*')
+    dirs += d
     files += fns
 
     files += ctx.path.ant_glob ('README*', relative_trick=True) + ' '
