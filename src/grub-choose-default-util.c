@@ -58,3 +58,94 @@ grub_choose_default_error_message (GtkWidget *parent, gchar * message)
   gtk_widget_destroy (dialog);
 }
 
+/**
+ * grub_choose_default_exec:
+ * #directory   : the directory to search the script in
+ * #script      : the file we should try to execute
+ *
+ * Searches in directory for script or script* and tries to execute it.
+ */
+gboolean
+grub_choose_default_exec(const gchar * directory, const gchar * script, GError **error)
+{
+  gchar * path;
+#ifdef G_OS_WIN32
+  GDir * dir;
+  const gchar * fn;
+  gchar * dirname, * basename;
+#endif
+
+  g_assert (**error == NULL || *error == NULL);
+
+  path = g_build_filename (directory, script, NULL);
+
+#ifdef G_OS_WIN32
+  dirname = g_path_get_dirname (path);
+  basename = g_path_get_basename (path);
+  g_free (path);
+
+  dir = g_dir_open (dirname, 0, NULL);
+
+  if (dir == NULL)
+  {
+    g_error_new (error, GCHD_ERROR,
+                 GCHD_ERROR_FILE_NOT_FOUND,
+                 "Could not find or open %s", dirname);
+    return FALSE;
+  }
+
+  while ((fn = g_dir_read_name (dir)) != NULL)
+  {
+    DBG ("Considering file %s", fn);
+    if (g_str_has_prefix (fn, basename))
+    {
+      DBG (" -> has prefix %s", basename);
+      path = g_build_filename (dirname, fn, NULL);
+
+      break;
+    }
+  }
+  g_dir_close (dir);
+#endif
+
+  g_print ("Trying to execute with prefix %s\n", path);
+
+  if (g_file_test (path, G_FILE_TEST_IS_EXECUTABLE))
+  {
+    gchar *argv[3];
+    gboolean r;
+
+#ifdef G_OS_WIN32
+    if (g_str_has_suffix (path, ".vbs"))
+    {
+      argv[0] = "cscript.exe";
+      argv[1] = path;
+      argv[2] = NULL;
+    }
+    else
+#endif
+    {
+      argv[0] = path;
+      argv[1] = NULL;
+    }
+
+    r = g_spawn_async (NULL,
+                       argv,
+                       NULL,
+                       G_SPAWN_SEARCH_PATH,
+                       NULL,
+                       NULL,
+                       NULL,
+                       error);
+
+    g_free (path);
+    return r;
+  }
+
+  g_free (path);
+  g_error_new (error, GCHD_ERROR,
+                GCHD_ERROR_FILE_NOT_FOUND,
+                "Could not find a script %s in %s", script, directory);
+  return FALSE;
+}
+

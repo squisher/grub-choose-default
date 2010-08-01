@@ -17,11 +17,29 @@
  */
 
 #include "grub-choose-default-window.h"
+#include "grub-choose-default-util.h"
 
+#ifndef DEBUG
+#ifdef G_OS_WIN32
 void
 no_output_handler (const gchar * str)
-{
+{ 
 }
+#endif
+#endif
+
+/* This function exists mainly to allow a windows7 ext2ifs workaround */
+void mount (void)
+{
+  const gchar * config_dir;
+  gchar * script;
+
+  config_dir = g_get_user_config_dir ();
+  script = g_build_filename (CONFIG_DIR, "mount", NULL);
+
+  grub_choose_default_exec (config_dir, script);
+}
+
 
 /*
 #ifdef G_OS_WIN32
@@ -42,6 +60,8 @@ main (int argc, char **argv)
   g_set_print_handler (no_output_handler);
 #endif
 #endif
+
+  mount ();
 
   win = grub_choose_default_window_new ();
 

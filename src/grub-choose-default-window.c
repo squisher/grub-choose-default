@@ -40,7 +40,6 @@
 static void update_reboot (GrubChooseDefaultWindow *win);
 static void update_once (GrubChooseDefaultWindow *win);
 static void perform_reboot (GrubChooseDefaultWindow *win);
-static gboolean tryandrun (GrubChooseDefaultWindow *win, const gchar * directory, const gchar * script);
 static void handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer data);
 static void handle_cancel (GtkButton *button, gpointer data);
 static void handle_reboot (GtkToggleButton *button, gpointer data);
@@ -257,87 +256,6 @@ update_once (GrubChooseDefaultWindow *win)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->radio_default), TRUE);
 }
 
-static gboolean
-tryandrun (GrubChooseDefaultWindow *win, const gchar * directory, const gchar * script)
-{
-  gchar * path;
-#ifdef G_OS_WIN32
-  GDir * dir;
-  const gchar * fn;
-  gchar * dirname, * basename;
-#endif
-
-  path = g_build_filename (directory, script, NULL);
-
-#ifdef G_OS_WIN32
-  dirname = g_path_get_dirname (path);
-  basename = g_path_get_basename (path);
-  g_free (path);
-
-  dir = g_dir_open (dirname, 0, NULL);
-
-  if (dir == NULL)
-    return FALSE;
-
-  while ((fn = g_dir_read_name (dir)) != NULL)
-  {
-    DBG ("Considering file %s", fn);
-    if (g_str_has_prefix (fn, basename))
-    {
-      DBG (" -> has prefix %s", basename);
-      path = g_build_filename (dirname, fn, NULL);
-
-      break;
-    }
-  }
-  g_dir_close (dir);
-#endif
-
-  g_print ("Looking for reboot script %s\n", path);
-
-  if (g_file_test (path, G_FILE_TEST_IS_EXECUTABLE))
-  {
-    gchar *argv[3];
-    GError * error = NULL;
-    gboolean r;
-
-#ifdef G_OS_WIN32
-    if (g_str_has_suffix (path, ".vbs"))
-    {
-      argv[0] = "cscript.exe";
-      argv[1] = path;
-      argv[2] = NULL;
-    }
-    else
-#endif
-    {
-      argv[0] = path;
-      argv[1] = NULL;
-    }
-
-    r = g_spawn_async (NULL,
-                       argv,
-                       NULL,
-                       G_SPAWN_SEARCH_PATH,
-                       NULL,
-                       NULL,
-                       NULL,
-                       &error);
-
-    if (!r)
-    {
-      g_warning ("%s", error->message);
-      g_error_free (error);
-    }
-
-    g_free (path);
-    return r;
-  }
-
-  g_free (path);
-  return FALSE;
-}
-
 static void
 perform_reboot (GrubChooseDefaultWindow *win)
 {
@@ -349,18 +267,20 @@ perform_reboot (GrubChooseDefaultWindow *win)
   gchar * script;
   GError *error = NULL;
 
-  script = g_build_filename ("grub-choose-default", "reboot", NULL);
+  script = g_build_filename (CONFIG_DIR, "reboot", NULL);
 
   config_dir = g_get_user_config_dir ();
 
-  r = tryandrun (win, config_dir, script);
+  r = grub_choose_default_exec (config_dir, script, NULL);
 
   if (r)
+  {
     return;
+  }
 
   for (config_dirs = g_get_system_config_dirs (); *config_dirs != NULL; config_dirs++)
   {
-    r = tryandrun (win, *config_dirs, script);
+    r = grub_choose_default_exec (*config_dirs, script, NULL);
     if (r)
       break;
   }

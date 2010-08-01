@@ -23,6 +23,9 @@
 
 G_BEGIN_DECLS
 
+#define CONFIG_DIR "grub-choose-default"
+
+gboolean grub_choose_default_exec (GrubChooseDefaultWindow *win, const gchar * directory, const gchar * script, GError **error);
 void grub_choose_default_error (GtkWidget *parent, GError *error);
 void grub_choose_default_error_message (GtkWidget *parent, gchar * message);
 
