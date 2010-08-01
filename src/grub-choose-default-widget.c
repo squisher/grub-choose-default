@@ -39,6 +39,13 @@ grub_choose_default_widget_init (gpointer g_iface)
                                                               FALSE,
                                                               G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
+    g_object_interface_install_property (g_iface,
+                                         g_param_spec_boolean ("once",
+                                                              "once",
+                                                              "Reboot only once with this selection",
+                                                              FALSE,
+                                                              G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
     iface->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED] = g_signal_new ("selected",
                                                                                G_TYPE_FROM_CLASS (g_iface), G_SIGNAL_ACTION,
                                                                                G_STRUCT_OFFSET (GrubChooseDefaultWidgetInterface, selected),

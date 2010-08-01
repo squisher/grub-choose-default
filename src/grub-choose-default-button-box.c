@@ -43,6 +43,7 @@ enum {
   PROP_0,
   PROP_DEFAULT_ENTRY,
   PROP_AUTO_COMMIT,
+  PROP_ONCE,
   PROP_GCHD,
   PROP_GRUB_DIR,
 };
@@ -72,6 +73,7 @@ struct _GrubChooseDefaultButtonBoxPrivate {
   GtkWidget ** buttons;
   gchar * def_entry;
   gboolean autocommit;
+  gboolean once;
 };
 
 static void
@@ -86,6 +88,9 @@ grub_choose_default_button_box_get_property (GObject *object, guint property_id,
     break;
   case PROP_AUTO_COMMIT:
     g_value_set_boolean (value, priv->autocommit);
+    break;
+  case PROP_ONCE:
+    g_value_set_boolean (value, priv->once);
     break;
   case PROP_GCHD:
     g_value_set_pointer (value, priv->gchd);
@@ -110,6 +115,9 @@ grub_choose_default_button_box_set_property (GObject *object, guint property_id,
     break;
   case PROP_AUTO_COMMIT:
     priv->autocommit = g_value_get_boolean (value);
+    break;
+  case PROP_ONCE:
+    priv->once = g_value_get_boolean (value);
     break;
   case PROP_GRUB_DIR:
     gchd_set_grub_dir (priv->gchd, g_value_get_string (value));
@@ -147,6 +155,7 @@ grub_choose_default_button_box_class_init (GrubChooseDefaultButtonBoxClass *klas
 
   g_object_class_override_property (object_class, PROP_DEFAULT_ENTRY, "default-entry");
   g_object_class_override_property (object_class, PROP_AUTO_COMMIT, "auto-commit");
+  g_object_class_override_property (object_class, PROP_ONCE, "once");
 
   g_object_class_install_property (object_class, PROP_GCHD,
            g_param_spec_pointer ("gchd", "gchd", "gchd", G_PARAM_READABLE));

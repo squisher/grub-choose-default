@@ -386,3 +386,17 @@ gchd_uses_default (Gchd * gchd, GError ** error)
 
   return TRUE;
 }
+
+/**
+ * gchd_set_once:
+ * @gchd   : a #Gchd.
+ * @enable : should the selection only be valid for the next reboot?
+ *
+ * If enable is true it will commit the user's selection to be used only
+ * for the next reboot.
+ **/
+void
+gchd_set_once (Gchd * gchd, gboolean enable)
+{
+    gchd->once = enable;
+}

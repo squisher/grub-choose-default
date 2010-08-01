@@ -42,6 +42,7 @@ struct _Gchd {
   GchdMenu menu;
   gchar * default_entry;
   gchar * grub_dir;
+  gboolean once;
 
   GchdSetDefaultCallback set_callback;
   gpointer set_callback_data;

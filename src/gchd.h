@@ -45,6 +45,7 @@ gint gchd_get_menu_entries (Gchd * gchd, GList **entries, GError **error);
 gchar * gchd_get_default_entry (Gchd * gchd, GError **error);
 gboolean gchd_set_default_entry (Gchd * gchd, gchar * entry, GchdSetDefaultCallback callback, gpointer data, GError **error);
 gboolean gchd_uses_default (Gchd * gchd, GError ** error);
+void gchd_set_once (Gchd * gchd, gboolean enable);
 
 void gchd_set_grub_dir (Gchd * gchd, const gchar * grub_dir);
 const gchar * gchd_get_grub_dir (Gchd * gchd);

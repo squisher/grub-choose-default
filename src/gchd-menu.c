@@ -29,8 +29,8 @@ parse_entries (GchdMenu *menu, gchar * contents) {
         /* matched "^menuentry */
 
         c += strlen (mi);
-        /* we expect at least one white space */
 
+        /* we expect at least one white space */
         if (*c != ' ')
           continue;
         else

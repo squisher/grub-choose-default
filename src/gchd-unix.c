@@ -142,7 +142,10 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
     i = 0;
   }
 
-  argv[i++] = "grub-set-default";
+  if (!gchd->once)
+    argv[i++] = "grub-set-default";
+  else
+    argv[i++] = "grub-reboot";
   argv[i++] = entry;
   argv[i++] = NULL;
 
