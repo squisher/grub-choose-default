@@ -17,6 +17,7 @@
  */
 
 #include "gchd-error.h"
+#include "gchd-util.h"
 #include "grub-choose-default-util.h"
 
 /**

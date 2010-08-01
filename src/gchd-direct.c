@@ -30,7 +30,8 @@
 #include "gchd-util.h"
 
 static const gchar * default_key = "saved_entry";
-static gchar * default_entry = NULL;
+static const gchar * prev_default_key = "prev_saved_entry";
+static gchar * current_default_entry = NULL;
 
 typedef struct {
   gchar * contents;
@@ -105,12 +106,12 @@ get_default_entry (Gchd * gchd, GError **error)
 
   grub_envblk_iterate (priv->env, find);
 
-  if (default_entry == NULL)
+  if (current_default_entry == NULL)
   {
     g_warning ("Could not find the default entry");
   }
 
-  return default_entry;
+  return current_default_entry;
 }
 
 static gboolean
@@ -126,7 +127,13 @@ set_default_entry (Gchd * gchd, gchar * entry, GError **error)
   env_filename = gchd_get_grub_file (gchd, "grubenv", error);
 
   if (env_filename)
+  {
     r = grub_envblk_set (priv->env, default_key, entry);
+    if (gchd->once && r)
+    {
+      r = grub_envblk_set (priv->env, prev_default_key, current_default_entry);
+    }
+  }
 
   if (!r)
   {
@@ -175,7 +182,7 @@ find (const char *name, const char *value)
 {
   if (strcmp (name, default_key) == 0)
   {
-    default_entry = g_strdup (value);
+    current_default_entry = g_strdup (value);
     return TRUE;
   }
   return FALSE; 

@@ -12,6 +12,13 @@ There is another ext3 driver project, called Ext2Fsd. At least at version 0.48
 the driver was unreliable - it created a "shadow" grub environment, and
 broke grub-choose-default until the shadow file was manually removed.
 
+Unfortunately Ext2IFS does not work well under Windows 7. Although it can be
+installed by running the installer in Windows Vista compatability mode, it
+forgets the drive letter assignments after every reboot. As a workaround you
+can let grub-choose-default mount the partition for you. Place the "mount"
+script provided in the examples directory in the configuration directory
+mentioned below.
+
 Once this directory is available under Windows, grub-choose-default should
 automatically find it by probing all available Windows drive letters.
 
