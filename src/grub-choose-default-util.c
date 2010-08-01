@@ -16,6 +16,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include "gchd-error.h"
 #include "grub-choose-default-util.h"
 
 /**
@@ -75,7 +76,7 @@ grub_choose_default_exec(const gchar * directory, const gchar * script, GError *
   gchar * dirname, * basename;
 #endif
 
-  g_assert (**error == NULL || *error == NULL);
+  g_assert (error == NULL || *error == NULL);
 
   path = g_build_filename (directory, script, NULL);
 
@@ -88,7 +89,7 @@ grub_choose_default_exec(const gchar * directory, const gchar * script, GError *
 
   if (dir == NULL)
   {
-    g_error_new (error, GCHD_ERROR,
+    g_set_error (error, GCHD_ERROR,
                  GCHD_ERROR_FILE_NOT_FOUND,
                  "Could not find or open %s", dirname);
     return FALSE;
@@ -143,7 +144,7 @@ grub_choose_default_exec(const gchar * directory, const gchar * script, GError *
   }
 
   g_free (path);
-  g_error_new (error, GCHD_ERROR,
+  g_set_error (error, GCHD_ERROR,
                 GCHD_ERROR_FILE_NOT_FOUND,
                 "Could not find a script %s in %s", script, directory);
   return FALSE;

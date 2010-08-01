@@ -344,7 +344,7 @@ set_default_done_callback (Gchd *gchd, gboolean success, gchar * error, gpointer
   if (!success)
   {
     grub_choose_default_error_message (gtk_widget_get_toplevel (GTK_WIDGET (bbox)), error);
-    g_error_free (error);
+    g_free (error);
   }
 
   g_signal_emit (bbox, widget_class->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED], 0, priv->def_entry);
