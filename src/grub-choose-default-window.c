@@ -38,11 +38,13 @@
 /*- private prototypes -*/
 
 static void update_reboot (GrubChooseDefaultWindow *win);
+static void update_once (GrubChooseDefaultWindow *win);
 static void perform_reboot (GrubChooseDefaultWindow *win);
 static gboolean tryandrun (GrubChooseDefaultWindow *win, const gchar * directory, const gchar * script);
 static void handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer data);
 static void handle_cancel (GtkButton *button, gpointer data);
 static void handle_reboot (GtkToggleButton *button, gpointer data);
+static void handle_once (GtkToggleButton *button, gpointer data);
 static void load_settings (GrubChooseDefaultWindow *win);
 static void save_settings (GrubChooseDefaultWindow *win);
 
@@ -52,6 +54,7 @@ static void save_settings (GrubChooseDefaultWindow *win);
 enum {
   PROP_0,
   PROP_REBOOT,
+  PROP_ONCE,
 };
 
 
@@ -68,8 +71,10 @@ typedef struct _GrubChooseDefaultWindowPrivate GrubChooseDefaultWindowPrivate;
 
 struct _GrubChooseDefaultWindowPrivate {
   GrubChooseDefaultWidget * box;
-  gboolean reboot;
+  gboolean reboot, once;
   GtkWidget * check_reboot;
+  GtkWidget * radio_default;
+  GtkWidget * radio_once;
   GKeyFile * config;
   gchar * config_fn;
   gchar * grub_dir;
@@ -84,6 +89,9 @@ grub_choose_default_window_get_property (GObject *object, guint property_id,
   switch (property_id) {
     case PROP_REBOOT:
       g_value_set_boolean (value, priv->reboot);
+      break;
+    case PROP_ONCE:
+      g_value_set_boolean (value, priv->once);
       break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -101,6 +109,11 @@ grub_choose_default_window_set_property (GObject *object, guint property_id,
       priv->reboot = g_value_get_boolean (value);
       DBG ("Setting reboot to %d", priv->reboot);
       update_reboot (GRUB_CHOOSE_DEFAULT_WINDOW (object));
+      break;
+    case PROP_ONCE:
+      priv->once = g_value_get_boolean (value);
+      DBG ("Setting once to %d", priv->once);
+      update_once (GRUB_CHOOSE_DEFAULT_WINDOW (object));
       break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -140,9 +153,11 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 {
   GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_WINDOW (self));
   GtkWidget *area, *scrolled;
-  GtkRequisition req, req_btn;
+  GtkRequisition req, req_vbox;
   GtkWidget *check_reboot;
   GtkWidget *button_cancel;
+  GtkWidget *vbox, *hbox;
+  GtkWidget *radio_once, *radio_default;
 
   priv->config_fn = g_build_filename (g_get_user_config_dir (), "grub-choose-default", "config", NULL);
   priv->config = g_key_file_new ();
@@ -168,12 +183,27 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 
   area = gtk_dialog_get_action_area (GTK_DIALOG (self));
 
+  vbox = gtk_vbox_new (TRUE, 2);
+  hbox = gtk_hbox_new (TRUE, 2);
+
+  priv->radio_default = radio_default = gtk_radio_button_new_with_label (NULL, "Set default");
+  priv->radio_once = radio_once = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio_default),
+                                                                               "Next reboot only");
+  gtk_box_pack_start (GTK_BOX (hbox), radio_default, TRUE, TRUE, 2);
+  gtk_box_pack_start (GTK_BOX (hbox), radio_once, TRUE, TRUE, 2);
+  g_signal_connect (radio_default, "toggled", G_CALLBACK (handle_once), self);
+  g_signal_connect (radio_once, "toggled", G_CALLBACK (handle_once), self);
+
+  gtk_container_add (GTK_CONTAINER (vbox), hbox);
+
   priv->check_reboot = check_reboot = gtk_check_button_new_with_label ("End session immediately");
   update_reboot (self);
   g_signal_connect (check_reboot, "toggled", G_CALLBACK (handle_reboot), self);
 
-  gtk_container_add (GTK_CONTAINER (area), check_reboot);
-  gtk_widget_show (check_reboot);
+  gtk_container_add (GTK_CONTAINER (vbox), check_reboot);
+
+  gtk_container_add (GTK_CONTAINER (area), vbox);
+  gtk_widget_show_all (vbox);
 
   button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
   gtk_container_add (GTK_CONTAINER (area), button_cancel);
@@ -182,9 +212,9 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 
 
   gtk_widget_size_request (GTK_WIDGET (priv->box), &req);
-  gtk_widget_size_request (GTK_WIDGET (button_cancel), &req_btn);
+  gtk_widget_size_request (GTK_WIDGET (vbox), &req_vbox);
 
-  req.height += req_btn.height + 25;
+  req.height += req_vbox.height + 25;
   req.width += 25;
 
   if (req.width > 600 )
@@ -209,6 +239,17 @@ update_reboot (GrubChooseDefaultWindow *win)
 
   if (priv->check_reboot)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->check_reboot), priv->reboot);
+}
+
+static void
+update_once (GrubChooseDefaultWindow *win)
+{
+  GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (win);
+
+  if (priv->once)
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->radio_once), TRUE);
+  else
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (priv->radio_default), TRUE);
 }
 
 static gboolean
@@ -367,12 +408,23 @@ handle_reboot (GtkToggleButton *button, gpointer data)
 }
 
 static void
+handle_once (GtkToggleButton *button, gpointer data)
+{
+  GrubChooseDefaultWindow *win = GRUB_CHOOSE_DEFAULT_WINDOW (data);
+  GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (win);
+
+  if (button == GTK_TOGGLE_BUTTON (priv->radio_once)) {
+      g_object_set (priv->box, "once", gtk_toggle_button_get_active (button), NULL);
+  }
+}
+
+static void
 load_settings (GrubChooseDefaultWindow *win)
 {
   GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (win);
   GError * error = NULL;
   gboolean r;
-  gboolean reboot;
+  gboolean reboot, once;
 
 
   if (!g_file_test (priv->config_fn, G_FILE_TEST_EXISTS))
@@ -400,6 +452,18 @@ load_settings (GrubChooseDefaultWindow *win)
     g_object_set (win, "reboot", reboot, NULL);
   }
 
+  once = g_key_file_get_boolean (priv->config, MAIN_GROUP, "once", &error);
+
+  if (error)
+  {
+    grub_choose_default_error (GTK_WIDGET (win), error);
+    g_error_free (error);
+  }
+  else
+  {
+    g_object_set (win, "once", once, NULL);
+  }
+
   if (g_key_file_has_key (priv->config, MAIN_GROUP, "grub_dir", &error))
     priv->grub_dir = g_key_file_get_string (priv->config, MAIN_GROUP, "grub_dir", &error);
 
@@ -423,6 +487,7 @@ save_settings (GrubChooseDefaultWindow *win)
   DBG ("Saving settings...");
 
   g_key_file_set_boolean (priv->config, MAIN_GROUP, "reboot", priv->reboot);
+  g_key_file_set_boolean (priv->config, MAIN_GROUP, "once", priv->once);
 
   /*
    * Don't save this, it's a user setting 

@@ -398,5 +398,6 @@ gchd_uses_default (Gchd * gchd, GError ** error)
 void
 gchd_set_once (Gchd * gchd, gboolean enable)
 {
+    DBG ("Once = %d", enable);
     gchd->once = enable;
 }

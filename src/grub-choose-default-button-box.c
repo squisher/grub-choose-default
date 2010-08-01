@@ -118,6 +118,7 @@ grub_choose_default_button_box_set_property (GObject *object, guint property_id,
     break;
   case PROP_ONCE:
     priv->once = g_value_get_boolean (value);
+    gchd_set_once (priv->gchd, priv->once);
     break;
   case PROP_GRUB_DIR:
     gchd_set_grub_dir (priv->gchd, g_value_get_string (value));
@@ -343,7 +344,7 @@ set_default_done_callback (Gchd *gchd, gboolean success, gchar * error, gpointer
   if (!success)
   {
     grub_choose_default_error_message (gtk_widget_get_toplevel (GTK_WIDGET (bbox)), error);
-    g_free (error);
+    g_error_free (error);
   }
 
   g_signal_emit (bbox, widget_class->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED], 0, priv->def_entry);
