@@ -3,7 +3,7 @@
 |                                                                            |
 | Copyright 2007-2010, David Mohr <david@mcbf.net>                           |
 |                                                                            |
-| Version 0.9, 2010-05-30                                                    |
+| Version 1.0, 2010-08-XX                                                    |
 |                                                                            |
 | Released under the GNU GPL v2 or higher                                    |
 | This is free software; see the source for copying conditions. There is NO  |
@@ -24,7 +24,7 @@ What it does is:
 1. Display your boot menu options, highlighting the current default.
 2. After clicking on one of the buttons, the new default will be saved in
    grub's environment.
-3. Optionally end your session.
+3. Optionally end your session (aka reboot / logout etc).
 
 
 *****************************************************************************

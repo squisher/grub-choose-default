@@ -1,3 +1,11 @@
+ v1.0   2010-08-XX
+-------------------
+ * Correctly save settings after cancelling.
+ * New "once" option - only sets new default for one reboot and not
+   permanently.
+ * New "mount" script: Executed at program start. This allows mounting
+   of Linux volumes under Windows 7 with ext2ifs.
+
  v0.9   2010-05-30
 -------------------
  * Use the icon for the window as well
