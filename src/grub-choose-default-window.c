@@ -35,6 +35,15 @@
 
 #define MAIN_GROUP "Settings"
 
+#define HELP_MARKUP "<i>Help:</i>\n" \
+                    "The result of click on one of the boot entry buttons is determined" \
+                    "by the radiobuttons below:\n" \
+                    "- <b>Set default</b> means the clicked entry will be set as the new default in grub.\n" \
+                    "- <b>Next reboot only</b> will change the default for one reboot, and then revert to the previous default.\n" \
+                    "\nSelect the checkbox below, <b>end session immediately</b>, if you want to reboot immediately.\n" \
+                    "Ending a session requires a script. See the README file for more information and the 'reboot'" \
+                    "directory for examples.\n"
+
 /*- private prototypes -*/
 
 static void update_reboot (GrubChooseDefaultWindow *win);
@@ -42,6 +51,7 @@ static void update_once (GrubChooseDefaultWindow *win);
 static void perform_reboot (GrubChooseDefaultWindow *win);
 static void handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer data);
 static void handle_cancel (GtkButton *button, gpointer data);
+static void handle_help (GtkButton *button, gpointer data);
 static void handle_reboot (GtkToggleButton *button, gpointer data);
 static void handle_once (GtkToggleButton *button, gpointer data);
 static void load_settings (GrubChooseDefaultWindow *win);
@@ -74,6 +84,7 @@ struct _GrubChooseDefaultWindowPrivate {
   GtkWidget * check_reboot;
   GtkWidget * radio_default;
   GtkWidget * radio_once;
+  GtkWidget * button_help;
   GKeyFile * config;
   gchar * config_fn;
   gchar * grub_dir;
@@ -158,10 +169,10 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 {
   GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_WINDOW (self));
   GtkWidget *area, *scrolled;
-  GtkRequisition req, req_vbox;
+  GtkRequisition req, req_hbox;
   GtkWidget *check_reboot;
-  GtkWidget *button_cancel;
-  GtkWidget *vbox, *hbox;
+  GtkWidget *button_cancel, *button_help;
+  GtkWidget *vbox, *hbox_radio, *hbox;
   GtkWidget *radio_once, *radio_default;
 
   priv->config_fn = g_build_filename (g_get_user_config_dir (), "grub-choose-default", "config", NULL);
@@ -186,34 +197,42 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 
   area = gtk_dialog_get_action_area (GTK_DIALOG (self));
 
-  vbox = gtk_vbox_new (TRUE, 2);
-  hbox = gtk_hbox_new (TRUE, 2);
+  vbox = gtk_vbox_new (FALSE, 2);
+  hbox_radio = gtk_hbox_new (FALSE, 2);
+  hbox = gtk_hbox_new (FALSE, 2);
+
+  //gtk_container_add (GTK_CONTAINER (area), hbox);
+  gtk_box_pack_start (GTK_BOX (area), hbox, TRUE, TRUE, 0);
+
+  priv->button_help = button_help = gtk_button_new_from_stock (GTK_STOCK_HELP);
+
+  gtk_box_pack_start (GTK_BOX (hbox), button_help, FALSE, FALSE, 0);
+  g_signal_connect (button_help, "clicked", G_CALLBACK (handle_help), self);
 
   priv->radio_default = radio_default = gtk_radio_button_new_with_label (NULL, "Set default");
   priv->radio_once = radio_once = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio_default),
                                                                                "Next reboot only");
-  gtk_box_pack_start (GTK_BOX (hbox), radio_default, TRUE, TRUE, 2);
-  gtk_box_pack_start (GTK_BOX (hbox), radio_once, TRUE, TRUE, 2);
+  gtk_box_pack_start (GTK_BOX (hbox_radio), radio_default, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox_radio), radio_once, TRUE, TRUE, 0);
 
-  gtk_container_add (GTK_CONTAINER (vbox), hbox);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_radio, TRUE, TRUE, 0);
 
   priv->check_reboot = check_reboot = gtk_check_button_new_with_label ("End session immediately");
 
-  gtk_container_add (GTK_CONTAINER (vbox), check_reboot);
+  gtk_box_pack_start (GTK_BOX (vbox), check_reboot, TRUE, TRUE, 0);
 
-  gtk_container_add (GTK_CONTAINER (area), vbox);
-  gtk_widget_show_all (vbox);
+  gtk_box_pack_start (GTK_BOX (hbox), vbox, TRUE, TRUE, 0);
 
   button_cancel = gtk_button_new_from_stock (GTK_STOCK_CANCEL);
-  gtk_container_add (GTK_CONTAINER (area), button_cancel);
+  gtk_box_pack_start (GTK_BOX (hbox), button_cancel, FALSE, FALSE, 0);
   g_signal_connect (button_cancel, "clicked", G_CALLBACK (handle_cancel), self);
-  gtk_widget_show (button_cancel);
 
+  gtk_widget_show_all (hbox);
 
   gtk_widget_size_request (GTK_WIDGET (priv->box), &req);
-  gtk_widget_size_request (GTK_WIDGET (vbox), &req_vbox);
+  gtk_widget_size_request (GTK_WIDGET (hbox), &req_hbox);
 
-  req.height += req_vbox.height + 25;
+  req.height += req_hbox.height + 25;
   req.width += 25;
 
   if (req.width > 600 )
@@ -321,6 +340,22 @@ handle_cancel (GtkButton *button, gpointer data)
   save_settings (win);
 
   gtk_dialog_response (GTK_DIALOG (win), GTK_RESPONSE_CANCEL);
+}
+
+static void
+handle_help (GtkButton *button, gpointer data)
+{
+  GrubChooseDefaultWindow *win = GRUB_CHOOSE_DEFAULT_WINDOW (data);
+
+  GtkWidget * dialog;
+  
+  dialog = gtk_message_dialog_new_with_markup (GTK_WINDOW (win),
+                                               GTK_DIALOG_MODAL,
+                                               GTK_MESSAGE_INFO,
+                                               GTK_BUTTONS_CLOSE,
+                                               HELP_MARKUP);
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
 }
 
 static void
