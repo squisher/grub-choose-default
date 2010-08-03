@@ -15,11 +15,11 @@ broke grub-choose-default until the shadow file was manually removed.
 Unfortunately Ext2IFS does not work well under Windows 7. Although it can be
 installed by running the installer in Windows Vista compatability mode, it
 forgets the drive letter assignments after every reboot. As a workaround you
-can let grub-choose-default mount the partition for you. Place the "mount"
-script provided in the examples directory in the configuration directory
-mentioned below.
+can let grub-choose-default mount the partition for you. Adjust the "mount.vbs"
+script provided in the "win32" directory and place it in the configuration
+directory mentioned below. It will be automatically executed if present.
 
-Once this directory is available under Windows, grub-choose-default should
+Once grub's directory is available under Windows, grub-choose-default should
 automatically find it by probing all available Windows drive letters.
 
 It searches for a "boot\grub" or just "grub" directory. If you do not want
@@ -30,6 +30,10 @@ file.
 The backslash, "\", must be quoted, e.g., 
   grub_dir=D:\\grub
 The configuration file is located in the "Application Data\grub-choose-default"
-folder inside your profile (usually "C:\Documents and Settings"). The default
-configuration is created after the the first program run. Add the grub_dir
-line to the end of the file.
+folder inside your profile (usually "C:\Documents and Settings") under Windows
+XP. Windows 7 hides that folder in
+    C:\Users\$USER\AppData\Roaming\grub-choose-default
+The default configuration is created after the the first program run. Add the
+grub_dir line to the end of the file.
+
+Happy booting!
