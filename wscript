@@ -112,59 +112,20 @@ def build (ctx):
     #
     print "Creating package..."
 
-    def glob (dirname, pattern):
-      files = ctx.path.ant_glob (dirname + '/' + pattern, relative_trick=True) + ' '
-
-      # find all subdirectories
-      dirs = set([dirname])
-      for f in files.rstrip().split(' '):
-        subdir = os.path.dirname (f)
-        dirs.add(subdir)
-      
-      return dirs, files
-
-    dirs = []
-    files = ''
-
-    d, fns  = glob ('src', '*.c')
-    dirs += d
-    files += fns
-    d, fns = glob ('src', '*.h')
-    dirs += d
-    files += fns
-    d, fns = glob ('reboot', '*')
-    dirs += d
-    files += fns
-    d, fns = glob ('icons', '**/*')
-    dirs += d
-    files += fns
-    d, fns = glob ('win32', '*')
-    dirs += d
-    files += fns
-
-    files += ctx.path.ant_glob ('README*', relative_trick=True) + ' '
-    files += 'ChangeLog NEWS AUTHORS '
-    files += 'EXPAT GPL-2 GPL-3 '
-    files += 'update-changelog.py waf '
-    files += 'grub-choose-default.desktop grub-choose-default.sgml '
-    files += 'wscript src/wscript_build '
-
     distdir = ('%(package)s-%(version)s') % { 'package': APPNAME, 'version': VERSION }
     tarname = distdir + '.tar.bz2'
 
-    # copy all the files into the appropriate subdirectory
-    os.mkdir (distdir)
-    for d in [distdir + '/' + x for x in set(dirs)]:
-      #print d
-      os.mkdir (d)
-    for f in files.split (' '):
-      if f:
-        shutil.copy (f, distdir + '/' + f)
+    Utils.exec_command ('git archive --format=tar --prefix=' + distdir + '/ HEAD | bzip2 > ' + tarname)
 
-    Utils.exec_command ('tar cjf ' + tarname + ' ' + distdir)
     Utils.exec_command ('sha1sum ' + tarname + ' > ' + tarname + '.SHA1')
 
     print "... " + tarname + " created"
-    shutil.rmtree (distdir)
+
+    windist = distdir + '-win32-setup.exe'
+    windir = '_build.win32_'
+    winsetup = os.path.join (windir, windist)
+    if os.path.exists (winsetup):
+        Utils.exec_command ('cd ' + windir + ' && sha1sum ' + windist + ' > ' + windist + '.SHA1')
+
     return
 
