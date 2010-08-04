@@ -67,9 +67,9 @@ main (int argc, char **argv)
 
   win = grub_choose_default_window_new ();
 
-  gtk_dialog_run (GTK_DIALOG (win));
+  gtk_widget_show (GTK_WIDGET (win));
 
-  gtk_widget_destroy (GTK_WIDGET (win));
+  gtk_main ();
 
   return 0;
 }
