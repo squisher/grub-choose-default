@@ -68,7 +68,7 @@ grub_choose_default_error_message (GtkWidget *parent, gchar * message)
  * Searches in directory for script or script* and tries to execute it.
  */
 gboolean
-grub_choose_default_exec(const gchar * directory, const gchar * script, GError **error)
+grub_choose_default_exec(const gchar * directory, const gchar * script, gboolean sync, GError **error)
 {
   gchar * path;
 #ifdef G_OS_WIN32
@@ -131,14 +131,27 @@ grub_choose_default_exec(const gchar * directory, const gchar * script, GError *
       argv[1] = NULL;
     }
 
-    r = g_spawn_async (NULL,
-                       argv,
-                       NULL,
-                       G_SPAWN_SEARCH_PATH,
-                       NULL,
-                       NULL,
-                       NULL,
-                       error);
+    if (sync) {
+      r = g_spawn_sync (NULL,
+                        argv,
+                        NULL,
+                        G_SPAWN_SEARCH_PATH,
+                        NULL,
+                        NULL,
+                        NULL,
+                        NULL, 
+                        NULL, 
+                        error);
+    } else {
+      r = g_spawn_async (NULL,
+                         argv,
+                         NULL,
+                         G_SPAWN_SEARCH_PATH,
+                         NULL,
+                         NULL,
+                         NULL,
+                         error);
+    }
 
     g_free (path);
     return r;

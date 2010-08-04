@@ -37,7 +37,7 @@ void mount (void)
   config_dir = g_get_user_config_dir ();
   script = g_build_filename (CONFIG_DIR, "mount", NULL);
 
-  grub_choose_default_exec (config_dir, script, NULL);
+  grub_choose_default_exec (config_dir, script, TRUE, NULL);
 
   g_free (script);
 }

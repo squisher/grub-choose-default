@@ -290,7 +290,7 @@ perform_reboot (GrubChooseDefaultWindow *win)
 
   config_dir = g_get_user_config_dir ();
 
-  r = grub_choose_default_exec (config_dir, script, NULL);
+  r = grub_choose_default_exec (config_dir, script, FALSE, NULL);
 
   if (r)
   {
@@ -299,7 +299,7 @@ perform_reboot (GrubChooseDefaultWindow *win)
 
   for (config_dirs = g_get_system_config_dirs (); *config_dirs != NULL; config_dirs++)
   {
-    r = grub_choose_default_exec (*config_dirs, script, NULL);
+    r = grub_choose_default_exec (*config_dirs, script, FALSE, NULL);
     if (r)
       break;
   }
