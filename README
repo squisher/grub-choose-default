@@ -22,9 +22,10 @@ are welcome).
 
 What it does is:
 1. Display your boot menu options, highlighting the current default.
-2. After clicking on one of the buttons, the new default will be saved in
-   grub's environment.
-3. Optionally end your session (aka reboot / logout etc).
+2. After clicking on one of the buttons, the selected entry will either be:
+  - set as the new default, or
+  - be used for the next reboot only ('once').
+3. Optionally end your session (aka reboot / logout menu).
 
 
 *****************************************************************************
@@ -33,13 +34,15 @@ What it does is:
 
 Step 2 requires root permissions. Grub-choose-default will call:
   $ sudo grub-set-default 'New Default'
+or
+  $ sudo grub-reboot 'New Default For Next Reboot'
 This requires an entry in sudoers with the NOPASSWD attribute. For example:
 "
-$user ALL=(root) NOPASSWD: /usr/sbin/grub-set-default
+$user ALL=(root) NOPASSWD: /usr/sbin/grub-set-default, NOPASSWD: /usr/sbin/grub-reboot
 "
 Where $user is your user name.
 
-Running grub-choose-default as root is not recommended.
+Running grub-choose-default as root is not recommended!
 
 
 *****************************************************************************
@@ -54,6 +57,19 @@ $XDG_CONFIG_DIR usually is ~/.config .
 If anyone can come up with a script that autodetects the DE and calls the
 appropriate logout command, please send me a copy and I will include it.
 
+
+*****************************************************************************
+* Windows 7
+***********
+
+Windows 7 is annoying since there is no good Linux filesystem drive support.
+The workaround known to me is to use Ext2IFS, install it in Windows Vista
+mode. It will work, but forget the assigned drive after every reboot.
+
+Grub-choose-default supports running a 'mount' script at start-up time. If you
+use 'mountvol' to find out the name of the volume you need to mount, you can
+adjust the script 'mount.vbs' and have the volume get mounted automatically.
+See README.win32 for more details.
 
 *****************************************************************************
 * To Do / Known limitations:
