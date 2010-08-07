@@ -49,6 +49,7 @@
 static void update_reboot (GrubChooseDefaultWindow *win);
 static void update_once (GrubChooseDefaultWindow *win);
 static void perform_reboot (GrubChooseDefaultWindow *win);
+static void quit (GrubChooseDefaultWindow *win);
 static void handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer data);
 static void handle_cancel (GtkButton *button, gpointer data);
 static void handle_delete (GtkWidget *widget, GdkEvent * event, gpointer data);
@@ -295,28 +296,35 @@ perform_reboot (GrubChooseDefaultWindow *win)
 
   r = grub_choose_default_exec (config_dir, script, FALSE, NULL);
 
-  if (r)
+  if (!r)
   {
-    return;
+    for (config_dirs = g_get_system_config_dirs (); *config_dirs != NULL && !r; config_dirs++)
+    {
+      r = grub_choose_default_exec (*config_dirs, script, FALSE, NULL);
+    }
+
+    /* we found no script */
+
+    if (!r)
+    {
+      g_set_error (&error,
+                  GCHD_ERROR, GCHD_ERROR_NO_REBOOT_SCRIPT,
+                  "Could not find any reboot scripts.\nYou can install one in %s/%s .",
+                  config_dir, script);
+      grub_choose_default_error (GTK_WIDGET (win), error);
+      g_error_free (error);
+    }
   }
-
-  for (config_dirs = g_get_system_config_dirs (); *config_dirs != NULL; config_dirs++)
-  {
-    r = grub_choose_default_exec (*config_dirs, script, FALSE, NULL);
-    if (r)
-      break;
-  }
-
-  /* we found no script */
-
-  g_set_error (&error,
-               GCHD_ERROR, GCHD_ERROR_NO_REBOOT_SCRIPT,
-               "Could not find any reboot scripts.\nYou can install one in %s/%s .",
-               config_dir, script);
-  grub_choose_default_error (GTK_WIDGET (win), error);
-  g_error_free (error);
 
   g_free (script);
+}
+
+static void
+quit (GrubChooseDefaultWindow *win)
+{
+  save_settings (win);
+
+  gtk_main_quit ();
 }
 
 static void
@@ -332,7 +340,7 @@ handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer dat
     perform_reboot (win);
   }
 
-  gtk_dialog_response (GTK_DIALOG (win), GTK_RESPONSE_ACCEPT);
+  quit ();
 }
 
 static void
@@ -340,10 +348,9 @@ handle_cancel (GtkButton *button, gpointer data)
 {
   GrubChooseDefaultWindow *win = GRUB_CHOOSE_DEFAULT_WINDOW (data);
 
-  save_settings (win);
-
-  gtk_main_quit ();
+  quit (win);
 }
+
 
 static void
 handle_delete (GtkWidget *widget, GdkEvent * event, gpointer data)
