@@ -34,7 +34,7 @@ SetCompressor lzma
 ###
 
 # Script version; displayed when running the installer
-!define GCHD_INSTALLER_VERSION "0.5"
+!define GCHD_INSTALLER_VERSION "0.6"
 
 # grub-choose-default program information
 !define PROGRAM_NAME "grub-choose-default"
@@ -145,6 +145,7 @@ Section "grub-choose-default" Section1
   File "grub-choose-default.ico"
 
   SetOutPath $APPDATA\grub-choose-default
+  File /oname=mount.vbs.example "mount.vbs"
   SetOverwrite off
   File /oname=reboot.vbs "..\reboot\windows.vbs"
   SetOverwrite lastused

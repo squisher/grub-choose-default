@@ -15,9 +15,11 @@ broke grub-choose-default until the shadow file was manually removed.
 Unfortunately Ext2IFS does not work well under Windows 7. Although it can be
 installed by running the installer in Windows Vista compatability mode, it
 forgets the drive letter assignments after every reboot. As a workaround you
-can let grub-choose-default mount the partition for you. Adjust the "mount.vbs"
-script provided in the "win32" directory and place it in the configuration
-directory mentioned below. It will be automatically executed if present.
+can let grub-choose-default mount the partition for you. Rename the
+"mount.vbs.example" script in the configuration directory mentioned below to
+"mount.vbs" and adjust it according to the comments in that file. It is a
+simple process that just requires one command line. "mount.vbs" will be
+automatically executed if present.
 
 Once grub's directory is available under Windows, grub-choose-default should
 automatically find it by probing all available Windows drive letters.

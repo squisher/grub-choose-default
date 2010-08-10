@@ -27,4 +27,4 @@ strArguments = "l: \\?\Volume{fe0e4803-7a3f-11df-bef1-001676bc6680}\"
 objShell.ShellExecute strApplication, strArguments, "", "runas"
 ' We need to sleep here because Windows takes a moment to
 ' make the drive available
-WScript.Sleep 2000
+WScript.Sleep 1500
