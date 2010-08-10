@@ -249,6 +249,7 @@ grub_choose_default_button_box_constructor (GType type, guint n_properties, GObj
     gtk_button_set_alignment (GTK_BUTTON (button), 0.0, 0.5);
 
     g_signal_connect (button, "clicked", G_CALLBACK (button_clicked), self);
+    gtk_widget_set_tooltip_markup (button, "Perform the action selected below on this boot entry.");
 
     gtk_box_pack_start (GTK_BOX (self), button,
                         FALSE, FALSE, 0);

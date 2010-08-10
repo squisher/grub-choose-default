@@ -36,11 +36,11 @@
 #define MAIN_GROUP "Settings"
 #define PADDING 2
 
-#define HELP_MARKUP "The result of click on one of the boot entry buttons is determined" \
-                    "by the radiobuttons below:\n" \
+#define HELP_MARKUP "This program is used to select a new default for grub. It will quit right after pressing one of the boot entry"
+                    " buttons. What happens after the click is selected in the area below:\n" \
                     "- <b>Set default</b> means the clicked entry will be set as the new default in grub.\n" \
                     "- <b>Next reboot only</b> will change the default for one reboot, and then revert to the previous default.\n" \
-                    "\nSelect the checkbox below, <b>end session immediately</b>, if you want to reboot immediately.\n" \
+                    "\nSelect the <b>end session immediately</b> checkbox, if you want to get a logout / reboot menu immediately.\n" \
                     "Ending a session requires a script. See the README file for more information and the 'reboot'" \
                     "directory for examples.\n"
 
@@ -170,10 +170,11 @@ static void
 grub_choose_default_window_init (GrubChooseDefaultWindow *self)
 {
   GrubChooseDefaultWindowPrivate *priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_WINDOW (self));
-  GtkWidget *area, *scrolled;
+  GtkWidget *scrolled;
   GtkRequisition req, req_hbox;
   GtkWidget *check_reboot;
   GtkWidget *button_cancel, *button_help;
+  GtkWidget *hsep;
   GtkWidget *vbox, *vbox_buttons, *hbox_radio, *hbox;
   GtkWidget *radio_once, *radio_default;
 
@@ -202,7 +203,7 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   hbox_radio = gtk_hbox_new (FALSE, PADDING);
   hbox = gtk_hbox_new (FALSE, PADDING);
 
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, PADDING);
 
   priv->button_help = button_help = gtk_button_new_from_stock (GTK_STOCK_HELP);
 
@@ -210,14 +211,22 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   g_signal_connect (button_help, "clicked", G_CALLBACK (handle_help), self);
 
   priv->radio_default = radio_default = gtk_radio_button_new_with_label (NULL, "Set default");
+  gtk_widget_set_tooltip_markup (radio_default, "Use the boot entry selected above as the new default.");
+
   priv->radio_once = radio_once = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio_default),
                                                                                "Next reboot only");
+  gtk_widget_set_tooltip_markup (radio_once, "Use the boot entry selected above as the default <b>once</b> for the next boot process.");
+
   gtk_box_pack_start (GTK_BOX (hbox_radio), radio_default, TRUE, TRUE, 0);
   gtk_box_pack_start (GTK_BOX (hbox_radio), radio_once, TRUE, TRUE, 0);
 
   gtk_box_pack_start (GTK_BOX (vbox_buttons), hbox_radio, TRUE, TRUE, 0);
 
+  hsep = gtk_hseparator_new ();
+  gtk_box_pack_start (GTK_BOX (vbox_buttons), hsep, TRUE, TRUE, 0);
+
   priv->check_reboot = check_reboot = gtk_check_button_new_with_label ("End session immediately");
+  gtk_widget_set_tooltip_markup (check_reboot, "If checked, end the session (e.g. show the logout menu) after selecting a boot entry above.");
 
   gtk_box_pack_start (GTK_BOX (vbox_buttons), check_reboot, TRUE, TRUE, 0);
 
@@ -232,7 +241,7 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   gtk_widget_size_request (GTK_WIDGET (priv->box), &req);
   gtk_widget_size_request (GTK_WIDGET (hbox), &req_hbox);
 
-  req.height += req_hbox.height + 4*PADDING;
+  req.height += req_hbox.height + 6*PADDING;
   req.width += 2*PADDING;
 
   if (req.width > 600 )
@@ -340,7 +349,7 @@ handle_selected (GrubChooseDefaultWidget *box, const gchar * entry, gpointer dat
     perform_reboot (win);
   }
 
-  quit ();
+  quit (win);
 }
 
 static void
@@ -355,7 +364,7 @@ handle_cancel (GtkButton *button, gpointer data)
 static void
 handle_delete (GtkWidget *widget, GdkEvent * event, gpointer data)
 {
-  GrubChooseDefaultWindow *win = GRUB_CHOOSE_DEFAULT_WINDOW (widget);
+  //GrubChooseDefaultWindow *win = GRUB_CHOOSE_DEFAULT_WINDOW (widget);
 
   gtk_main_quit ();
 }
