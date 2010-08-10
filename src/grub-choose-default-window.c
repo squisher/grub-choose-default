@@ -36,11 +36,11 @@
 #define MAIN_GROUP "Settings"
 #define PADDING 2
 
-#define HELP_MARKUP "This program is used to select a new default for grub. It will quit right after pressing one of the boot entry"
+#define HELP_MARKUP "This program is used to select a new default for grub. It will quit right after pressing one of the boot entry" \
                     " buttons. What happens after the click is selected in the area below:\n" \
                     "- <b>Set default</b> means the clicked entry will be set as the new default in grub.\n" \
                     "- <b>Next reboot only</b> will change the default for one reboot, and then revert to the previous default.\n" \
-                    "\nSelect the <b>end session immediately</b> checkbox, if you want to get a logout / reboot menu immediately.\n" \
+                    "\nSelect the <b>end session immediately</b> checkbox if you want to get a logout / reboot menu immediately.\n" \
                     "Ending a session requires a script. See the README file for more information and the 'reboot'" \
                     "directory for examples.\n"
 
