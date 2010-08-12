@@ -36,12 +36,13 @@
 #define MAIN_GROUP "Settings"
 #define PADDING 2
 
-#define HELP_MARKUP "This program is used to select a new default for grub. It will quit right after pressing one of the boot entry" \
-                    " buttons. What happens after the click is selected in the area below:\n" \
+#define HELP_MARKUP PACKAGE " " VERSION "\n\n" \
+                    "This program is used to select a new default boot entry for grub. Each boot entry is displayed on a button in " \
+                    "the main part of the window. What happens after a click on a boot entry button is selected in the area below:\n" \
                     "- <b>Set default</b> means the clicked entry will be set as the new default in grub.\n" \
                     "- <b>Next reboot only</b> will change the default for one reboot, and then revert to the previous default.\n" \
                     "\nSelect the <b>end session immediately</b> checkbox if you want to get a logout / reboot menu immediately.\n" \
-                    "Ending a session requires a script. See the README file for more information and the 'reboot'" \
+                    "Ending a session requires a script. See the README file for more information and the 'reboot' " \
                     "directory for examples.\n"
 
 /*- private prototypes -*/
@@ -177,6 +178,11 @@ grub_choose_default_window_init (GrubChooseDefaultWindow *self)
   GtkWidget *hsep;
   GtkWidget *vbox, *vbox_buttons, *hbox_radio, *hbox;
   GtkWidget *radio_once, *radio_default;
+
+#ifdef G_OS_WIN32
+  /* FIXME: doesn't seem to help much... buttons still don't have images in win32 */
+  g_object_set (gtk_settings_get_default (), "gtk-button-images", TRUE, NULL);
+#endif
 
   priv->config_fn = g_build_filename (g_get_user_config_dir (), "grub-choose-default", "config", NULL);
   priv->config = g_key_file_new ();
