@@ -1,41 +1,71 @@
-The grub configuration is stored in your Linux file system, usually under
-/boot. Grub-choose-default for Windows needs access to the grub/ subdirectory
-of that folder.
+* Dependencies *
 
-If you have your root or boot directory on an ext2/3 partition, then you can
-easily make it available under Windows using the ext2 Windows FS driver from 
-  http://www.fs-driver.org/
-Note that this driver, Ext2IFS, does not work with larger partitions. The
-correct setup here is to put /boot on its own partition. Then Ext2IFS will
-work just fine.
-There is another ext3 driver project, called Ext2Fsd. At least at version 0.48
-the driver was unreliable - it created a "shadow" grub environment, and
-broke grub-choose-default until the shadow file was manually removed.
+Changing grub defaults requires access to the Linux filesystem where grub's
+configuration files are located. This requires a Windows filesystem driver to
+be installed. Such a driver is not packaged with grub-choose-default, but read
+on for a description of the common ext2/3 solution. If you know of other
+filesystems that have Windows drivers please contact the author and this
+document will be updated.
 
-Unfortunately Ext2IFS does not work well under Windows 7. Although it can be
-installed by running the installer in Windows Vista compatability mode, it
-forgets the drive letter assignments after every reboot. As a workaround you
-can let grub-choose-default mount the partition for you. Rename the
-"mount.vbs.example" script in the configuration directory mentioned below to
-"mount.vbs" and adjust it according to the comments in that file. It is a
-simple process that just requires one command line. "mount.vbs" will be
-automatically executed if present.
 
-Once grub's directory is available under Windows, grub-choose-default should
-automatically find it by probing all available Windows drive letters.
+* Ext2/3 *
 
-It searches for a "boot\grub" or just "grub" directory. If you do not want
-grub-choose-default to search for the folder, or you want to improve the program
-start-up time, you can set the hidden option 'grub_dir' in the configuration
-file. 
+There is a stable driver available at  http://www.fs-driver.org/  .
+Unfortunately there are some restrictions:
+- It does not work with some large partitions. You don't run into this issue
+  if you setup /boot to be on its own partition.
+- Windows 7 is not fully supported. See below for a workaround.
 
-The backslash, "\", must be quoted, e.g., 
+There is another driver, Ext2Fsd, which has been updated more recently.
+However, as of version 0.48 it was buggy and I advise against its use.
+
+
+* Hidden Configuration Options *
+
+Grub-choose-default saves its configuration in the standard locations:
+- Windows XP:
+  C:\Documents and Settings\$USER\Application Data\grub-choose-default
+- Windows 7:
+  C:\Users\$USER\AppData\Roaming\grub-choose-default
+Note that you probably need to turn on hidden files to see navigate to these
+directories.
+
+The grub configuration is found by searching through all drives for a 'grub'
+or a 'boot/grub' directory. Sometimes this triggers error messages because
+media detection failed. If you want to avoid this, you can pin
+grub-choose-default to look only at a specific drive: Open the 'config' file
+in the above location, and add to the end of the file:
   grub_dir=D:\\grub
-The configuration file is located in the "Application Data\grub-choose-default"
-folder inside your profile (usually "C:\Documents and Settings") under Windows
-XP. Windows 7 hides that folder in
-    C:\Users\$USER\AppData\Roaming\grub-choose-default
-The default configuration is created after the the first program run. Add the
-grub_dir line to the end of the file.
+Where D: is the drive that contains your grub configuration. And don't forget
+the double backslash in place of a single one.
+
+
+* Windows 7 *
+
+The driver from http://www.fs-driver.org/ refuses to install at first. However
+in Windows Vista compatibility mode the installer will work, and at first it
+will operate as expected. You can choose the compatibility mode by
+right-clicking the executable.
+
+After a reboot it will forget the drive letter that you assigned. You can go
+into the control panel and assign the letter again, but this process is quite
+cumbersome. Grub-choose-default can do this for you if you adjust some
+settings in the 'mount.vbs.example' file which ships in the configuration
+directory mentioned above. In this file you might want to change the drive
+letter, but you must enter the correct volume name and save it as 'mount.vbs'
+in the same directory.
+
+The volume name can be found by trial and error: Open a command prompt
+(Start->Run->cmd.exe) and run 'mountvol'. It will print the volume names of
+all partitions on your computer. Try those do not have a drive letter
+assigned and run 'mountvol l: <volume-name>'. If it is not the desired
+partition, you can remove the drive assignment by running 'mountvol l: /d' and
+try the next one.
+
 
 Happy booting!
+
+
+* Feedback *
+
+If you have suggestions or found a bug, please let me know at david@mcbf.net .
