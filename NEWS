@@ -1,4 +1,4 @@
- v1.0   2010-08-XX
+ v1.0   2010-08-14
 -------------------
  * Correctly save settings after cancelling.
  * New "once" option - only sets new default for one reboot and not

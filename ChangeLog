@@ -1,4 +1,90 @@
+2010-08-14  David Mohr <david@mcbf.net>
+
+  * README.win32:
+    Improving the windows README text
+
+2010-08-13  David Mohr <david@mcbf.net>
+
+  * src/grub-choose-default-window.c:
+    Improving help text, trying to show button icons under win32.
+
+2010-08-10  David Mohr <david@mcbf.net>
+
+  * README.win32, win32/mount.vbs, win32/win32-installer.nsi:
+    Add mount.vbs to the win32 distribution, update README.win32 accordingly
+
+  * src/grub-choose-default-window.c:
+    Improve visuals, help text, add tooltips.
+
+  * src/grub-choose-default-button-box.c, src/grub-choose-default-window.c:
+    Improve visuals, help text, add tooltips.
+
+2010-08-07  David Mohr <david@mcbf.net>
+
+  * src/grub-choose-default-window.c:
+    Bugfixes.
+    * Make the exec function work more efficiently and without leaks.
+    * Cleanup remainders of the GtkDialog base class.
+
+2010-08-05  David Mohr <david@mcbf.net>
+
+  * .gitattributes, wscript:
+    Using git-archive to create the tarball.
+
+  * README:
+    README updates
+
+2010-08-04  David Mohr <david@mcbf.net>
+
+  * src/grub-choose-default-main.c, src/grub-choose-default-window.c:
+    Convert from using a dialog base class to window.
+
+  * src/grub-choose-default-main.c, src/grub-choose-default-util.c,
+    src/grub-choose-default-util.h, src/grub-choose-default-window.c:
+    Make the mount call sync, and leave the rest async
+
+  * src/grub-choose-default-window.c:
+    Adding a help button.
+
+2010-08-03  David Mohr <david@mcbf.net>
+
+  * README.win32, win32/mount.vbs:
+    Update README, include example script
+
+2010-08-01  David Mohr <david@mcbf.net>
+
+  * README.win32, src/gchd-direct.c, src/grub-choose-default-util.c:
+    Implement "once" for Windows, update README.
+
+  * NEWS, README, win32/win32-installer.nsi, wscript:
+    Docs update, late post release bump
+
+  * src/grub-choose-default-main.c, src/grub-choose-default-util.c,
+    src/grub-choose-default-util.h, src/grub-choose-default-window.c:
+    Adding mount script
+
+  * src/grub-choose-default-window.c:
+    Correctly save reboot, and also save the once setting.
+
+  * src/gchd.c, src/grub-choose-default-button-box.c,
+    src/grub-choose-default-window.c:
+    Fix segfault on timeout; gui, settings for 'once'.
+
+  * src/gchd-internal.h, src/gchd-menu.c, src/gchd-unix.c, src/gchd.c,
+    src/gchd.h, src/grub-choose-default-button-box.c,
+    src/grub-choose-default-widget.c:
+    Enable backend once under Unix
+
 2010-05-30  David Mohr <david@mcbf.net>
+
+  * wscript:
+    Don't forget files when packaging
+
+  * wscript:
+    Also create subdirectories when packaging
+
+  * ChangeLog, NEWS, README, README.win32, wscript:
+    Preparing for release
 
   * wscript:
     Implement our own package command. Only the files I want are included, and the tar extracts into the appropriate subdirectory.
