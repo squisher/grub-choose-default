@@ -24,18 +24,18 @@
 
 G_BEGIN_DECLS
 
-typedef struct {
+typedef struct gchd_menu_struct {
   gchar * loc;
   gchar * name;
   GList * entries; /* of type GchdEntry * */
   gint n_entries;
   gboolean default_saved;
+  struct gchd_menu_struct * parent;
 } GchdMenu;
 
 typedef struct {
     gchar * name;
     GchdMenu * submenu;
-    GchdMenu * parent;
 } GchdEntry;
 
 struct _Gchd {
