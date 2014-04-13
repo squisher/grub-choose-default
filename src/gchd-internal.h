@@ -26,10 +26,17 @@ G_BEGIN_DECLS
 
 typedef struct {
   gchar * loc;
-  GList * entries; /* of type char* */
+  gchar * name;
+  GList * entries; /* of type GchdEntry * */
   gint n_entries;
   gboolean default_saved;
 } GchdMenu;
+
+typedef struct {
+    gchar * name;
+    GchdMenu * submenu;
+    GchdMenu * parent;
+} GchdEntry;
 
 struct _Gchd {
   /* virtual functions */

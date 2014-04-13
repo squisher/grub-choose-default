@@ -14,73 +14,81 @@ static gint parse_entries (GchdMenu *menu, gchar * contents);
 static gint
 parse_entries (GchdMenu *menu, gchar * contents) {
   gchar * cp, * c, * e;
-  gchar * entry;
+  GchdEntry * entry;
   gchar quote;
   static const gchar *mi = "menuentry";
   static const gchar *sd = "set default=\"${saved_entry}\"";
 
   for (cp = NULL, c = contents; *c != '\0'; cp = c, c++)
   {
-    /* look for the letter 'm' at the beginning of a line */
-    if (*c == 'm' && (cp == NULL || *cp == '\n'))
-    {
-      if (strncmp (c, mi, strlen(mi)) == 0)
+    if (cp == NULL || *cp == '\n') {
+      /* beginning of a line */
+
+      /* skip white spaces */
+      while (*c == ' ' || *c == '\t') c++;
+
+      /* look for the letter 'm' at the beginning of a line */
+      if (*c == 'm')
       {
-        /* matched "^menuentry */
+        if (strncmp (c, mi, strlen(mi)) == 0)
+        {
+          /* matched "^menuentry */
 
-        c += strlen (mi);
+          c += strlen (mi);
 
-        /* we expect at least one white space */
-        if (*c != ' ')
-          continue;
-        else
-          c++;
-        
-        /* skip additional white spaces */
-        while (*c == ' ')
-          c++;
-
-        /* expect the (opening) quotes */
-        if (*c != '"')
-          if (*c != '\'')
+          /* we expect at least one white space */
+          if (*c != ' ')
             continue;
           else
+            c++;
+
+          /* skip additional white spaces */
+          while (*c == ' ')
+            c++;
+
+          /* expect the (opening) quotes */
+          if (*c != '"')
+            if (*c != '\'')
+              continue;
+            else
+            {
+              quote = '\'';
+              c++;
+            }
+          else
           {
-            quote = '\'';
+            quote = '"';
             c++;
           }
-        else
-        {
-          quote = '"';
-          c++;
-        }
 
-        /* find the (closing) quotes */
-        for (e = c; (*e != '\0') && (*e != quote); e++) ;
+          /* find the (closing) quotes */
+          for (e = c; (*e != '\0') && (*e != quote); e++) ;
 
-        if (*e == '\0') {
+          if (*e == '\0') {
+            c = e;
+            continue;
+          }
+
+          /* copy the entry */
+          *e = '\0';
+          entry = g_new0 (GchdEntry, 1);
+          entry->name = g_strdup (c);
           c = e;
-          continue;
+
+          menu->entries = g_list_prepend (menu->entries, entry);
+          menu->n_entries++;
         }
-
-        /* copy the entry */
-        *e = '\0';
-        entry = g_strdup (c);
-        c = e;
-
-        menu->entries = g_list_prepend (menu->entries, entry);
-        menu->n_entries++;
       }
-    }
-    else if (*c == 's' && (cp == NULL || *cp == '\n'))
-    {
-      if (strncmp (c, sd, strlen(sd)) == 0)
+      else if (*c == 's')
       {
-        /* Matched sd to the beginning of the line.
-         * That's good enough, we assume it's only spaces
-         * and comments on the remainder of the line. */
+        if (strncmp (c, sd, strlen(sd)) == 0)
+        {
+          /* Matched sd to the beginning of the line.
+           * That's good enough, we assume it's only spaces
+           * and comments on the remainder of the line. */
 
-        menu->default_saved = TRUE;
+          menu->default_saved = TRUE;
+        }
       }
     }
   }
@@ -126,9 +134,16 @@ gchd_get_menu (Gchd *gchd, GError **error) {
 }
 
 void
+gchd_entry_free (gpointer data, gpointer user_data)
+{
+  g_free (((GchdEntry *)data)->name);
+  g_free (data);
+}
+
+void
 gchd_menu_free (GchdMenu *menu)
 {
   g_free (menu->loc);
-  g_list_foreach (menu->entries, (GFunc) g_free, NULL);
+  g_list_foreach (menu->entries, gchd_entry_free, NULL);
   g_list_free (menu->entries);
 }

@@ -23,6 +23,7 @@
 
 #include "grub-choose-default-button-box.h"
 #include "gchd.h"
+#include "gchd-internal.h"
 #include "gchd-util.h"
 #include "grub-choose-default-widget.h"
 #include "grub-choose-default-util.h"
@@ -220,7 +221,7 @@ grub_choose_default_button_box_constructor (GType type, guint n_properties, GObj
        i++, entries = g_list_next (entries))
   {
     GtkWidget * button;
-    gchar * entry = entries->data;
+    GchdEntry* entry = entries->data;
     GtkWidget * label;
 
     priv->buttons[i] = button = gtk_button_new ();
@@ -228,19 +229,19 @@ grub_choose_default_button_box_constructor (GType type, guint n_properties, GObj
 
     label = gtk_label_new ("");
 
-    if (strcmp (entry, def_entry) == 0)
+    if (strcmp (entry->name, def_entry) == 0)
     {
       //gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NORMAL);
       //gtk_label_set_attributes (GTK_LABEL (label), "use-underline");
       gchar * markup;
 
-      markup = g_strdup_printf ("<b>%s</b>", entry);
+      markup = g_strdup_printf ("<b>%s</b>", entry->name);
       gtk_label_set_markup (GTK_LABEL (label), markup);
       g_free (markup);
     }
     else
     {
-      gtk_label_set_text (GTK_LABEL (label), entry);
+      gtk_label_set_text (GTK_LABEL (label), entry->name);
     }
 
     gtk_container_add (GTK_CONTAINER (button), label);
@@ -272,13 +273,13 @@ button_clicked (GtkButton *button, gpointer user_data)
   GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (bbox);
   GrubChooseDefaultWidgetInterface * widget_class = g_type_default_interface_peek (GRUB_CHOOSE_DEFAULT_TYPE_WIDGET);
 
-  const gchar *label;
+  const GchdEntry *label;
 
   label = g_object_get_data (G_OBJECT (button), "entry");
 
   g_assert (label != NULL);
 
-  priv->def_entry = g_strdup (label);
+  priv->def_entry = g_strdup (label->name);
 
   DBG ("Pressed %s", label);
 
