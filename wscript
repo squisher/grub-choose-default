@@ -53,6 +53,7 @@ def configure (ctx):
 
   ctx.check_tool ('gcc')
   ctx.check_tool ('gnu_dirs')
+  ctx.check_cfg (package='glib-2.0', args='--cflags --libs', uselib_store='GLIB', mandatory=True)
   ctx.check_cfg (package='gtk+-2.0', args='--cflags --libs', uselib_store='GTK', mandatory=True)
   if Options.platform != 'win32':
     if ctx.find_program ('docbook-to-man', var='DOCBOOKTOMAN'):
