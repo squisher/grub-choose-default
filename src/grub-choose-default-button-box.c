@@ -77,6 +77,8 @@ struct _GrubChooseDefaultButtonBoxPrivate {
   gboolean once;
 };
 
+static void buttonize (GrubChooseDefaultButtonBox * box, GchdMenu *menu);
+
 static void
 grub_choose_default_button_box_get_property (GObject *object, guint property_id,
                               GValue *value, GParamSpec *pspec)
@@ -186,10 +188,8 @@ grub_choose_default_button_box_constructor (GType type, guint n_properties, GObj
   GObject * self;
 
   GError *error = NULL;
-  int i;
   GList *entries;
   gint n_entries;
-  gchar * def_entry;
 
   self = G_OBJECT_CLASS (parent_class)->constructor (type, n_properties, properties);
   priv = GET_PRIVATE (GRUB_CHOOSE_DEFAULT_BUTTON_BOX (self));
@@ -204,9 +204,9 @@ grub_choose_default_button_box_constructor (GType type, guint n_properties, GObj
     return self;
   }
 
-  def_entry = gchd_get_default_entry (priv->gchd, &error);
+  priv->def_entry = gchd_get_default_entry (priv->gchd, &error);
 
-  if (def_entry == NULL)
+  if (priv->def_entry == NULL)
   {
     grub_choose_default_error (NULL, error);
     g_error_free (error);
@@ -214,10 +214,39 @@ grub_choose_default_button_box_constructor (GType type, guint n_properties, GObj
     return self;
   }
 
-  priv->buttons = g_new (GtkWidget *, n_entries);
+  buttonize (GRUB_CHOOSE_DEFAULT_BUTTON_BOX (self), &(priv->gchd->menu));
+
+  return self;
+}
+
+
+/***************/
+/*- internals -*/
+/***************/
+
+static void
+buttonize (GrubChooseDefaultButtonBox * box, GchdMenu *menu)
+{
+  GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (box);
+
+  int i;
+  GList *entries;
+  GList *children, *iter;
+
+  children = gtk_container_get_children(GTK_CONTAINER(box));
+  for(iter = children; iter != NULL; iter = g_list_next(iter))
+    gtk_widget_destroy(GTK_WIDGET(iter->data));
+  g_list_free(children);
+
+  entries = menu->entries;
+
+  if (priv->buttons)
+    g_free (priv->buttons);
+
+  priv->buttons = g_new (GtkWidget *, menu->n_entries);
 
   for (i=0;
-       i<n_entries && entries != NULL;
+       i<menu->n_entries && entries != NULL;
        i++, entries = g_list_next (entries))
   {
     GtkWidget * button;
@@ -229,7 +258,7 @@ grub_choose_default_button_box_constructor (GType type, guint n_properties, GObj
 
     label = gtk_label_new ("");
 
-    if (strcmp (entry->name, def_entry) == 0)
+    if (strcmp (entry->name, priv->def_entry) == 0)
     {
       //gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NORMAL);
       //gtk_label_set_attributes (GTK_LABEL (label), "use-underline");
@@ -249,22 +278,15 @@ grub_choose_default_button_box_constructor (GType type, guint n_properties, GObj
 
     gtk_button_set_alignment (GTK_BUTTON (button), 0.0, 0.5);
 
-    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked), self);
+    g_signal_connect (button, "clicked", G_CALLBACK (button_clicked), box);
     gtk_widget_set_tooltip_markup (button, "Perform the action selected below on this boot entry.");
 
-    gtk_box_pack_start (GTK_BOX (self), button,
+    gtk_box_pack_start (GTK_BOX (box), button,
                         FALSE, FALSE, 0);
       
     gtk_widget_show (button);
   }
-
-  return self;
 }
-
-
-/***************/
-/*- internals -*/
-/***************/
 
 static void
 button_clicked (GtkButton *button, gpointer user_data)
@@ -273,15 +295,26 @@ button_clicked (GtkButton *button, gpointer user_data)
   GrubChooseDefaultButtonBoxPrivate *priv = GET_PRIVATE (bbox);
   GrubChooseDefaultWidgetInterface * widget_class = g_type_default_interface_peek (GRUB_CHOOSE_DEFAULT_TYPE_WIDGET);
 
-  const GchdEntry *label;
+  const GchdEntry *entry;
 
-  label = g_object_get_data (G_OBJECT (button), "entry");
+  entry = g_object_get_data (G_OBJECT (button), "entry");
 
-  g_assert (label != NULL);
+  g_assert (entry != NULL);
 
-  priv->def_entry = g_strdup (label->name);
+  priv->def_entry = g_strdup (entry->name);
 
-  DBG ("Pressed %s", label);
+  DBG ("Pressed %s", entry->name);
+
+  if (entry->submenu)
+  {
+    buttonize (bbox, entry->submenu);
+    return;
+  }
+  else if (entry->parentmenu)
+  {
+    buttonize (bbox, entry->parentmenu);
+    return;
+  }
 
   if (priv->autocommit)
   {
@@ -291,7 +324,7 @@ button_clicked (GtkButton *button, gpointer user_data)
   }
   else
   {
-    g_signal_emit (bbox, widget_class->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED], 0, label);
+    g_signal_emit (bbox, widget_class->signals[GRUB_CHOOSE_DEFAULT_WIDGET_SIGNAL_SELECTED], 0, entry);
   }
 }
 

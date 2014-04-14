@@ -34,8 +34,9 @@ typedef struct gchd_menu_struct {
 } GchdMenu;
 
 typedef struct {
-    gchar * name;
-    GchdMenu * submenu;
+  gchar * name;
+  GchdMenu * submenu;
+  GchdMenu * parentmenu;
 } GchdEntry;
 
 struct _Gchd {

@@ -142,6 +142,14 @@ parse_entries (GchdMenu *menu, gchar ** contents) {
       if (level < 0)
       {
         DBG ("Returning from submenu");
+
+        entry = g_new0 (GchdEntry, 1);
+        entry->name = g_strdup ("<-");
+        entry->parentmenu = menu->parent;
+
+        menu->entries = g_list_prepend (menu->entries, entry);
+        menu->n_entries++;
+
         c++;
         break;
       }
