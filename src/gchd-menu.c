@@ -203,7 +203,10 @@ gchd_get_menu (Gchd *gchd, GError **error) {
 void
 gchd_entry_free (gpointer data, gpointer user_data)
 {
-  g_free (((GchdEntry *)data)->name);
+  GchdEntry * entry = (GchdEntry *)data;
+  g_free (entry->name);
+  if (entry->submenu)
+    gchd_menu_free (entry->submenu);
   g_free (data);
 }
 
