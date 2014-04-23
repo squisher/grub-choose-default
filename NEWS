@@ -1,3 +1,9 @@
+v1.1   2014-04-22
+=================
+
+* Improved parsing of grub.cfg
+* Sub-menus
+
  v1.0   2010-08-14
 -------------------
  * Correctly save settings after cancelling.

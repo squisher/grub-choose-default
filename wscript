@@ -20,7 +20,7 @@ else:
   out = '_build_'
 
 APPNAME = 'grub-choose-default'
-VERSION = '1.0'
+VERSION = '1.1'
 IS_DEV=False
 
 
