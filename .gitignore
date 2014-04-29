@@ -1,8 +1,8 @@
 grub-choose-default.8
 _build*_
 .waf-*/
-waf-*/
 .lock*wscript
 tags
 *-stamp
 *.tar.bz2*
+waf-modules/**/*.pyc
