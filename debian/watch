@@ -1,0 +1,3 @@
+version=3
+http://dsp.mcbf.net/releases/ \
+	grub-choose-default-([\d\.]+)\.tar\.(?:gz|bz2)

@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+
+LDFLAGS=$(shell dpkg-buildflags --get LDFLAGS)
+CFLAGS=$(shell dpkg-buildflags --get CFLAGS)
+LDFLAGS+=-Wl,--as-needed -Wl,-O1
+
+# waf was probably a suboptimal choice...
+export LINKFLAGS=$(LDFLAGS)
+export CFLAGS
+
+export DEB_BUILD_HARDENING=1
+
+WAF = ./waf --nocache
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	$(WAF) distclean
+	rm -rf .waf*
+	rm -rf `find waf-modules -name "*.pyc"`
+	rm -rf .lock-wscript
+
+override_dh_auto_configure:
+	$(WAF) configure --prefix=/usr --distribution=2
+
+override_dh_auto_build:
+	$(WAF) build
+
+override_dh_auto_install:
+	$(WAF) install --destdir=$(CURDIR)/debian/tmp
+	# remove spurious doc files
+	rm -f $(CURDIR)/debian/tmp/usr/share/doc/grub-choose-default/ChangeLog 
+	rm -f $(CURDIR)/debian/tmp/usr/share/doc/grub-choose-default/GPL-*
+	# remove unimportant test program
+	rm -f $(CURDIR)/debian/tmp/usr/bin/gchd-test
+
+override_dh_strip:
+	dh_strip --dbg-package=grub-choose-default-dbg

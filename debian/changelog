@@ -1,0 +1,5 @@
+grub-choose-default (1.2-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #745588)
+
+ -- David Mohr <david@mcbf.net>  Sun, 27 Apr 2014 20:04:18 -0600

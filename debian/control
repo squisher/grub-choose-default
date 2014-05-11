@@ -1,0 +1,29 @@
+Source: grub-choose-default
+Section: admin
+Priority: extra
+Maintainer: David Mohr <david@mcbf.net>
+Uploaders: David Mohr <david@mcbf.net>
+Build-Depends: debhelper (>= 7.0.50), pkg-config, libgtk2.0-dev (>= 2.16.0), python, quilt (>= 0.46-7)
+Standards-Version: 3.9.5
+Homepage: http://ds.mcbf.net/wiki/GrubChooseDefault
+
+Package: grub-choose-default
+Section: admin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: grub-pc (>= 1.98) | grub-efi (>= 1.98)
+Description: GUI to set the grub default
+ Grub-choose-default is a simple GUI to select the default boot entry for
+ grub2.
+
+Package: grub-choose-default-dbg
+Section: debug
+Architecture: any
+Priority: extra
+Depends: grub-choose-default (= ${binary:Version}), ${misc:Depends}
+Description: GUI to set the grub default
+ Grub-choose-default is a simple GUI to select the default boot entry for
+ grub2.
+ .
+ This package contains the debugging symbols.
+

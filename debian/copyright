@@ -1,0 +1,29 @@
+This package was downloaded from
+http://de.mcbf.net/david/grubchoosedefault/
+
+Files: *
+Copyright: © 2008-2014 David Mohr <david@mcbf.net>
+License: GPL-2+
+ On Debian systems, the complete text of the GNU General Public License
+ (version 2) can be found in `/usr/share/common-licenses/GPL-2'.
+
+Files: debian/*
+Copyright: © 2009 Yves-Alexis Perez <corsac@debian.org>
+Copyright: © 2010-2014 David Mohr <david@mcbf.net>
+License: GPL-2+
+ On Debian systems, the complete text of the GNU General Public License
+ (version 2) can be found in `/usr/share/common-licenses/GPL-2'.
+
+Files: wscript
+Copyright: © 2010 David Mohr <david@mcbf.net>
+License: EXPAT
+ See the included file EXPAT
+
+Files: win32/win32-installer.nsi
+Copyright: © 2009-2010 Jesper Lund <mail@jesperlund.com>
+Copyright: © 2009-2010 Andrew Resch <andrewresch@gmail.com>
+Copyright: © 2009-2010 John Garland <johnnybg@gmail.com>
+Copyright: © 2010      David Mohr <david@mcbf.net>
+License: GPL-3+
+ On Debian systems, the complete text of the GNU General Public License
+ (version 3) can be found in `/usr/share/common-licenses/GPL-3'.
