@@ -1,5 +1,0 @@
-*.o
-gchd-test
-grub-choose-default
-core*
-*.tags
